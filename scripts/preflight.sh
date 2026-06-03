@@ -101,6 +101,18 @@ have_any() {
   return 1
 }
 
+slack_keychain_secret_present() {
+  command -v security >/dev/null 2>&1 || return 1
+
+  local service="${NF_SLACK_WEBHOOK_KEYCHAIN_SERVICE:-nightfall/slack-webhook}"
+  local account="${NF_SLACK_WEBHOOK_KEYCHAIN_ACCOUNT:-${USER:-}}"
+  if [ -n "$account" ]; then
+    security find-generic-password -a "$account" -s "$service" -w >/dev/null 2>&1
+  else
+    security find-generic-password -s "$service" -w >/dev/null 2>&1
+  fi
+}
+
 # Reachability without depending on curl flags being uniform across versions.
 reachable() {
   local host="$1"
@@ -359,7 +371,10 @@ notify_secret=""
 notify_var=""
 case "$NOTIFY_BACKEND" in
   none)     skip "NF_NOTIFY_BACKEND=none — no push alerts (CI/dry runs only)" ;;
-  slack)    notify_var="NIGHTFALL_SLACK_WEBHOOK"; notify_secret="${NIGHTFALL_SLACK_WEBHOOK:-}" ;;
+  slack)    notify_var="NIGHTFALL_SLACK_WEBHOOK or Keychain service nightfall/slack-webhook"
+            if [ -n "${NIGHTFALL_SLACK_WEBHOOK:-}" ] || slack_keychain_secret_present; then
+              notify_secret="set"
+            fi ;;
   ntfy)     notify_var="NTFY_URL";       notify_secret="${NTFY_URL:-}" ;;
   pushover) notify_var="PUSHOVER_TOKEN+PUSHOVER_USER"
             [ -n "${PUSHOVER_TOKEN:-}" ] && [ -n "${PUSHOVER_USER:-}" ] && notify_secret="set" ;;

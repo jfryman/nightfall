@@ -97,12 +97,14 @@ to change." Acceptable for the spike; revisit before Phase B.
 
 - [ ] Mobile notifications configured — the primary channel. Pick a backend via
       `NF_NOTIFY_BACKEND` (`slack` | `ntfy` | `pushover` | `webhook`) and set its
-      secret: `NIGHTFALL_SLACK_WEBHOOK`, or `NTFY_URL` (+`NTFY_TOKEN`), or
-      `PUSHOVER_TOKEN`+`PUSHOVER_USER`, or `NF_WEBHOOK_URL`. Both the supervisor
-      and the agent push through `scripts/notify.sh`; severity maps to provider
-      priority so blockers buzz and routine progress stays quiet. The agent calls
-      the helper and **never holds the raw secret** (the helper reads it from the
-      env, which the supervisor exports into Codex). Verify with
+      secret: Slack can use `NIGHTFALL_SLACK_WEBHOOK` or a macOS Keychain generic
+      password with service `nightfall/slack-webhook` and account `$USER`;
+      alternatives use `NTFY_URL` (+`NTFY_TOKEN`), `PUSHOVER_TOKEN`+
+      `PUSHOVER_USER`, or `NF_WEBHOOK_URL`. Both the supervisor and the agent
+      push through `scripts/notify.sh`; severity maps to provider priority so
+      blockers buzz and routine progress stays quiet. The agent calls the helper
+      and **never holds the raw secret** (the helper reads it from the environment
+      or Keychain). Verify with
       `./scripts/preflight.sh --test-notify` (sends one alert to your phone).
 - [ ] Budget ceiling set as supervisor env vars at launch: `NF_MAX_HOURS`,
       `NF_MAX_ITERS`, `NF_MAX_STUCK`, `NF_ITER_TIMEOUT_SEC`.
