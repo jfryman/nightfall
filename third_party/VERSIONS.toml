@@ -1,68 +1,37 @@
-# Nightfall dependency and toolchain source-of-truth.
+# Nightfall pinned dependencies — source of truth for versions.
 #
-# Bootstrap status:
-# The accepted policy is "latest stable as of bootstrap date, with exact hashes
-# recorded here once provisioning/network access is available." This file exists
-# so the repo has a durable, reviewable manifest shape before vendoring begins.
+# Policy (decisions-log 2026-05-28): pin the latest stable tag/release of each dep
+# as of bootstrap, record the exact commit/hash here, and require a `DEP-UPDATE:`
+# commit tag to change any pin. Fill the <pin> placeholders before launch;
+# scripts/preflight.sh reports them as unfilled until you do.
+#
+# (Naming note: kept as VERSIONS.toml to match nightfall-plan-macos.md. If you'd
+# rather use JSONC, say so and the references get updated to match.)
 
-[policy]
-bootstrap_date = "2026-05-28"
-selection_rule = "latest stable release or tag as of bootstrap date"
-change_control = "DEP-UPDATE commit tag required for changes"
-bootstrap_policy_accepted = true
-exact_pins_materialized = false
+[toolchain]
+xcode = "<pin>"          # `xcodebuild -version`
+macos = "<pin>"          # `sw_vers -productVersion` on smugglebook
+xcodegen = "<pin>"       # `xcodegen --version`
+cmake = "<pin>"
 
-[dependencies.musashi]
-kind = "git"
-role = "68k CPU emulation"
-selection_status = "policy-approved pending exact commit"
+[deps.musashi]
+repo   = "https://github.com/kstenerud/Musashi"
+commit = "<pin>"
 
-[dependencies.nlohmann_json]
-kind = "release"
-role = "JSON support"
-selection_status = "policy-approved pending exact tag"
+[deps.nlohmann_json]
+repo = "https://github.com/nlohmann/json"
+tag  = "<pin>"
 
-[dependencies.glsl_crt]
-kind = "git"
-role = "shader CRT support"
-selection_status = "policy-approved pending exact commit"
+[deps.glsl_crt]
+repo   = "https://github.com/wessles/GLSL-CRT"   # adapted to Metal Shading Language in Phase 6
+commit = "<pin>"
 
-[tools.vasm]
-kind = "tool"
-role = "68k fixture assembler"
-selection_status = "installed for Phase 1"
-version = "vasm 1.8e"
-backend = "vasm M68k/CPU32/ColdFire cpu backend 2.3c"
-syntax_module = "vasm motorola syntax module 3.12"
-installed_binary = "vasmm68k_mot"
+[deps.vasm]
+url     = "http://sun.hasenbraten.de/vasm/"       # 68k fixture assembler (Phase 1)
+version = "<pin>"
 
-[tools.libabigail]
-kind = "tool"
-role = "ABI diff tooling"
-selection_status = "policy-approved pending exact version and Mach-O validation"
-
-[toolchain.doctest]
-kind = "header-only test framework"
-decision = "selected"
-version = "v2.5.2"
-tag_commit = "6804767ee637789db8a5cb281381cae98dc36906"
-published_at = "2026-04-14T10:41:26Z"
-source = "https://github.com/doctest/doctest"
-vendored_header = "third_party/doctest/doctest.h"
-
-[toolchain.libfuzzer]
-kind = "fuzz engine"
-decision = "selected"
-
-[toolchain.sanitizers]
-required = ["asan", "ubsan"]
-best_effort = ["tsan"]
-
-[toolchain.xcodegen]
-kind = "project generator"
-decision = "selected"
-
-[build_host]
-target = "smugglebook"
-os = "macOS 26"
-arch = "arm64"
+# ABI gate: abidiff/libabigail is ELF/DWARF-oriented; the C ABI is Mach-O. Verify
+# Mach-O support or substitute a symbol-dump/header-snapshot diff in Phase 2
+# (decisions-log "Open"). Pin only if the chosen mechanism uses it.
+[deps.libabigail]
+version = "<pin>"

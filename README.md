@@ -1,53 +1,51 @@
-# nightfall
+# Nightfall
 
-Bootstrap repository for the Nightfall spike.
+An After Dark–compatible screensaver for modern macOS that runs original 68k
+modules — and, more to the point, a testbed for a repeatable agentic-development
+pattern. *The screensaver is the excuse; the pattern is the product.*
 
-Imported from `/Users/james/Downloads/files.zip`:
+This repository is set up to be executed by an autonomous agent (Codex) running
+on the build host under an external supervisor, with the maintainer adjudicating
+blockers asynchronously. The current run is scoped to the **Phases 0–3
+checkpoint** (see `docs/decisions-log.md`).
 
-- `AGENTS.md`
-- `docs/autonomous-operation.md`
-- `docs/preflight.md`
-- `docs/decisions-log.md`
-- `docs/attestations/TEMPLATE.md`
-- `scripts/preflight.sh`
-- `scripts/supervise.sh`
-- `scripts/notify.sh`
+## Read order
 
-Bootstrap scaffolding now also includes:
+1. `nightfall-plan-macos.md` — the plan: scope, architecture, the 22 committed
+   decisions (Q1–Q22), phases, gates. Canonical for *what* and *when to stop*.
+2. `nightfall-agent-prompt-macos-v2.md` — the agent's bootstrap brief.
+3. `docs/autonomous-operation.md` — the loop contract (how it runs unattended).
+4. `docs/preflight.md` — what must be provisioned before launch.
+5. `AGENTS.md` — the always-in-context summary the agent re-reads after compaction.
 
-- a reconstructed [nightfall-plan-macos.md](/Users/james/repo/src/github.com/jfryman/nightfall/nightfall-plan-macos.md)
-- a reconstructed [nightfall-agent-prompt-macos-v2.md](/Users/james/repo/src/github.com/jfryman/nightfall/nightfall-agent-prompt-macos-v2.md)
-- a bootstrap [third_party/VERSIONS.toml](/Users/james/repo/src/github.com/jfryman/nightfall/third_party/VERSIONS.toml)
-- placeholder clean-room and blocker workflow documents under
-  [docs](/Users/james/repo/src/github.com/jfryman/nightfall/docs)
-- a minimal CMake-based `nightfall_core` library and local test executable
-- first-pass gate scripts for the core/app boundary and source linting
-
-These files are intentionally explicit about what is reconstructed, what is
-policy, and what still needs maintainer-provided exact values.
-
-## Local Development
-
-Run the current local build, tests, and early gate checks with:
+## Run it
 
 ```sh
-scripts/ci/run-local.sh
+./scripts/preflight.sh            # read-only; tells you what to authorize
+#   ...fill VERSIONS.toml, register the runner, set a notify backend, etc...
+./scripts/preflight.sh            # repeat until exit 0
+./scripts/supervise.sh --dry-run  # preflight + show the plan, no launch
+./scripts/supervise.sh            # bounded autonomous loop
+touch docs/HALT                   # kill switch: stops cleanly after the cycle
 ```
 
-This is the manual-session path. The autonomous supervisor remains available,
-but it is not required for day-to-day bring-up.
+Configuration knobs (env): `NF_MAX_HOURS`, `NF_MAX_ITERS`, `NF_MAX_STUCK`,
+`NF_ITER_TIMEOUT_SEC`, `NF_CODEX_CMD`, `NF_NOTIFY_BACKEND` (+ the backend's secret).
 
-Current local checks:
+## What's here vs. what the agent builds
 
-- CMake configure/build
-- CTest
-- required ASan/UBSan sanitizer run, with TSan best-effort
-- `abi-guard`
-- `boundary-check`
-- `nflint`
-- `depcheck`
-- `toolcheck`
-- `trace-schema-guard`
-- `tbcover`
-- 68k assembler fixture smoke
-- gate meta-tests for each implemented gate
+Shipped (governance/bootstrap): the plan, the prompt, `AGENTS.md`, the `docs/`
+contract + templates + decisions log, the `scripts/` (preflight / supervise /
+notify), and `third_party/VERSIONS.toml` (pins to fill).
+
+**Built by the agent during execution** (do not pre-create — that defeats the
+spike): the enforcement gates (`nflint`, `tbcover`, `abi-guard`, `boundary-check`,
+the PR-checklist bot), the CI workflow, `CMakeLists.txt`, the XcodeGen project,
+the C ABI header `nightfall.h`, and everything under `core/`.
+
+## Decisions and blockers
+
+Settled decisions live in `docs/decisions-log.md`. When the agent hits something
+the plan doesn't cover, it writes a blocker (`docs/blockers/`, template provided),
+buzzes the maintainer, and halts; you unblock by appending an `## Adjudication …
+**Resume:** yes` block to that doc.

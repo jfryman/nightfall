@@ -50,7 +50,7 @@ clean-room attestation language) are not script-checkable and are recorded in
       arm64). The project is macOS-only; CI runners cannot install a `.saver` into
       a human's `~/Library/Screen Savers/`, and several validation steps are
       Mac-local — `smugglebook` is where the agent builds, smoke-tests, and (in
-      Phase A, beyond this spike) installs.
+      Phase 7/10) installs.
 - [ ] CI runner: **`smugglebook` registered as a self-hosted macOS runner**
       (so branch-protection required checks execute and gate merges). Verified by
       `preflight.sh` §5 under `ci-mode=actions`.
@@ -64,11 +64,12 @@ clean-room attestation language) are not script-checkable and are recorded in
 - [ ] GitHub token scoped to repo + actions, available to the agent via
       environment/CI secret — never written to the tree. `nflint` already bans
       committed secrets; confirm it covers token shapes.
-- [ ] Phase A signing: Developer ID cert present in the build host's keychain
-      for local signing. (Q19 KMS/OIDC/Terraform is Phase B — not required now;
-      record that explicitly so the agent doesn't attempt it.)
-- [ ] No other credentials required for Phases 0–3. (Telemetry is none per Q21;
-      the only outbound is the Q18 weekly Releases check, read-only.)
+- [ ] Phase A signing: Developer ID Application cert in the build host's login
+      keychain for local signing — needed by Phase 7/10 (the `.app`/`.saver` build
+      and install). (Q19 KMS/OIDC/Terraform is Phase B cloud-signing — still not
+      required; record that so the agent doesn't attempt it.)
+- [ ] No other credentials required for Phase A. (Telemetry is none per Q21; the
+      only outbound is the Q18 weekly Releases check, read-only.)
 
 ## D. Pinned versions and toolchain decisions
 
@@ -97,14 +98,12 @@ to change." Acceptable for the spike; revisit before Phase B.
 
 - [ ] Mobile notifications configured — the primary channel. Pick a backend via
       `NF_NOTIFY_BACKEND` (`slack` | `ntfy` | `pushover` | `webhook`) and set its
-      secret: Slack can use `NIGHTFALL_SLACK_WEBHOOK` or a macOS Keychain generic
-      password with service `nightfall/slack-webhook` and account `$USER`;
-      alternatives use `NTFY_URL` (+`NTFY_TOKEN`), `PUSHOVER_TOKEN`+
-      `PUSHOVER_USER`, or `NF_WEBHOOK_URL`. Both the supervisor and the agent
-      push through `scripts/notify.sh`; severity maps to provider priority so
-      blockers buzz and routine progress stays quiet. The agent calls the helper
-      and **never holds the raw secret** (the helper reads it from the environment
-      or Keychain). Verify with
+      secret: `NIGHTFALL_SLACK_WEBHOOK`, or `NTFY_URL` (+`NTFY_TOKEN`), or
+      `PUSHOVER_TOKEN`+`PUSHOVER_USER`, or `NF_WEBHOOK_URL`. Both the supervisor
+      and the agent push through `scripts/notify.sh`; severity maps to provider
+      priority so blockers buzz and routine progress stays quiet. The agent calls
+      the helper and **never holds the raw secret** (the helper reads it from the
+      env, which the supervisor exports into Codex). Verify with
       `./scripts/preflight.sh --test-notify` (sends one alert to your phone).
 - [ ] Budget ceiling set as supervisor env vars at launch: `NF_MAX_HOURS`,
       `NF_MAX_ITERS`, `NF_MAX_STUCK`, `NF_ITER_TIMEOUT_SEC`.
@@ -178,13 +177,13 @@ Settled:
    required checks under `ci-mode=actions`).
 2. **macOS build/install target** — ✅ `smugglebook` (Apple Silicon, macOS 26,
    arm64). Also the self-hosted CI runner.
-3. **Spike scope** — ✅ Phases 0–3 checkpoint, terminal.
+3. **Run scope** — ✅ lifted to Phase A (build the app); 0–3 spike complete.
 4. `VERSIONS.toml` pins — ✅ default policy (latest stable as of bootstrap, hash
    recorded, `DEP-UPDATE:` to change).
 5. Xcode project generator — ✅ XcodeGen (`project.yml`); CMake stays the
    authority for `libnightfall`.
 6. Test / fuzz / sanitizers — ✅ doctest; libFuzzer; ASan + UBSan required, TSan
-   best-effort (not a required check this spike).
+   active for Phase 6+ threading; promote to required once threaded code lands.
 7. Notification substrate — ✅ Slack webhook, **relayed by the supervisor** (the
    agent writes durable in-repo state and never holds the secret).
 

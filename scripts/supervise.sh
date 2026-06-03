@@ -47,6 +47,7 @@ set -uo pipefail   # NOT -e: the loop must survive a failed iteration.
 : "${NF_BLOCKERS_DIR:=docs/blockers}"
 : "${NF_PHASE_FILE:=docs/current-phase.md}"
 : "${NF_PREFLIGHT:=scripts/preflight.sh}"
+: "${NF_BOUNDARY_LABEL:=Phase A (full app)}"   # what "complete" means this run
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 NOTIFY="$SCRIPT_DIR/notify.sh"
@@ -103,10 +104,10 @@ unresolved_blocker() {
   return 1
 }
 
-# Terminal state for the spike: the agent records this in current-phase.md when
-# it reaches the chosen boundary (Phases 0-3 checkpoint).
+# Terminal state for this run: the agent records this when it reaches the
+# configured boundary (NF_BOUNDARY_LABEL).
 boundary_reached() {
-  [ -f "$NF_PHASE_FILE" ] && grep -qiE '^\s*\*\*Spike status:\*\*\s*complete' "$NF_PHASE_FILE" 2>/dev/null
+  [ -f "$NF_PHASE_FILE" ] && grep -qiE '^\s*\*\*Run status:\*\*\s*complete' "$NF_PHASE_FILE" 2>/dev/null
 }
 
 # ---------------------------------------------------------------------------
@@ -173,7 +174,7 @@ while : ; do
     exit 0
   fi
   if boundary_reached; then
-    hb "SPIKE COMPLETE — Phases 0-3 checkpoint reached. Stopping (success)." high; exit 0
+    hb "RUN COMPLETE — $NF_BOUNDARY_LABEL reached. Stopping (success)." high; exit 0
   fi
 
   # --- run one iteration ---------------------------------------------------
@@ -189,7 +190,7 @@ while : ; do
     hb "BLOCKED after iteration $iter: $BLOCKER_PATH . Re-run after adjudicating." urgent; exit 0
   fi
   if boundary_reached; then
-    hb "SPIKE COMPLETE after iteration $iter — Phases 0-3 reached. Stopping (success)." high; exit 0
+    hb "RUN COMPLETE after iteration $iter — $NF_BOUNDARY_LABEL reached. Stopping (success)." high; exit 0
   fi
 
   post_head=$(repo_head); post_phase=$(phase_sig)

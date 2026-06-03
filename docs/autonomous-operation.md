@@ -7,7 +7,7 @@ Where this document and the plan conflict on loop mechanics, this document wins;
 on scope/architecture/Q-decisions, the plan wins.
 
 The maintainer decisions this document once flagged are now **resolved** and
-recorded below (merge policy §2, spike scope §7); they are also in
+recorded below (merge policy §2, run scope §7); they are also in
 `docs/decisions-log.md`. The loop is driven by an external supervisor
 (`scripts/supervise.sh`) that gates on `scripts/preflight.sh`, enforces the
 budget ceiling and kill switch from outside the agent, and relays the agent's
@@ -91,7 +91,7 @@ is the least likely to honor them. So these three live in the external superviso
 to keep durable in-repo state truthful; the supervisor does the enforcing and the
 relaying.
 
-**Budget ceiling (per spike run).** Hard caps held by the supervisor
+**Budget ceiling (per supervisor session).** Hard caps held by the supervisor
 (`NF_MAX_HOURS`, `NF_MAX_ITERS`, `NF_MAX_STUCK`, `NF_ITER_TIMEOUT_SEC`) and echoed
 into `current-phase.md` at launch: wall-clock hours, max Codex relaunches, max
 consecutive no-progress iterations (catches global flailing the per-subphase cycle
@@ -99,6 +99,12 @@ budget would miss), and a per-iteration watchdog. Hitting a cap is a
 **budget-exhaustion halt**, not a blocker — the supervisor relays a
 `BUDGET-EXHAUSTED` heartbeat and stops; nothing is wrong with the *plan*, the run
 simply spent its envelope and waits for the human to extend it.
+
+These are *per-session* caps. Phase A is ~50 working days of agent work, so it
+spans many supervisor sessions (evenings/weekends); each `supervise.sh` launch is
+bounded by these ceilings, and you relaunch to continue. Size `NF_MAX_HOURS` /
+`NF_MAX_ITERS` to a session you're comfortable leaving unattended, not to the
+whole project — the 0–3 spike defaults are likely too small now.
 
 **Kill switch.** `docs/HALT`. The supervisor checks it before and after every
 iteration and stops cleanly if present; the agent also checks it on reconciliation
@@ -115,7 +121,7 @@ priority so blockers buzz and routine progress stays quiet). Two senders use it:
   appropriate severity.
 - The **agent** may push in-the-moment alerts (it calls `notify.sh`; it never
   reads the secret, which the helper takes from the environment): `urgent` when it
-  opens a blocker and halts, `high` at a phase milestone or spike completion.
+  opens a blocker and halts, `high` at a phase milestone or run completion.
   Routine per-cycle progress is the supervisor's job, not the agent's.
 
 Durable in-repo state (`current-phase.md`, blocker docs) remains the source of
@@ -171,30 +177,31 @@ entry, moves the blocker doc to a resolved state (rename to
 `docs/blockers/resolved/<phase>-<short>.md`), updates `current-phase.md`, and
 continues.
 
-## 7. Spike scope for this run — **resolved: Phases 0–3 checkpoint**
+## 7. Run scope — **Phase A (build the app)**
 
-A spike is bounded uncertainty-reduction. The thesis under test is "an agent can
-be trusted to drive this gated pattern unattended" — fully exercised by **Phases 0
-through the first checkpoint (Phases 0–3)**: every gate, the trace pipeline, the
-clean-room paper trail, the blocker/resume loop, and the heartbeat, with the
-fewest external dependencies (no real `.AD` in the core path, no signing, no
-Mac-local install beyond build, no licensed-content surface).
+The initial run was a spike bounded to the Phases 0–3 checkpoint, to test the
+thesis "an agent can be trusted to drive this gated pattern unattended." That
+checkpoint was reached and the thesis held (decisions-log). **Scope is now lifted
+to all of Phase A:** the agent continues sequentially from the current phase
+through Phase 10 (ship Phase A). Phases 0–3 deliverables exist and are not
+rebuilt.
 
-**Decision: run to the Phases 0–3 checkpoint, then stop — regardless of remaining
-budget.** This is a deliberate terminal state, not a way-station; the agent does
-not begin Phase 4. (The rejected alternative was running to Phase A complete,
-bounded only by the §4 ceiling.) On reaching the boundary the agent records the
-terminal marker the supervisor watches for — exactly `**Spike status:** complete`
-in `current-phase.md` — and treats it as a clean halt (no blocker doc; the
-supervisor relays a success heartbeat).
+This brings external dependencies that the spike deliberately avoided into play —
+local Developer ID signing (Phase A), maintainer-manual real-module validation
+(Phase 8), and the non-deterministic Metal golden layer (Phase 6) — see §4 budget
+notes and `preflight.md`. On reaching Phase 10 the agent records the terminal
+marker the supervisor watches for — exactly `**Run status:** complete` in
+`current-phase.md` — and treats it as a clean halt (no blocker doc; supervisor
+relays success). Phase B (signing/notarization/distribution, the name gate) and
+Phase C are out of scope without explicit direction.
 
 ## 8. "Run until" — consolidated halt conditions
 
 The agent runs continuously between halts. It halts on exactly one of (heartbeats
 are relayed by the supervisor, not emitted by the agent):
 
-1. **Spike scope boundary reached** (§7) — clean halt; agent sets `**Spike
-   status:** complete`, supervisor relays success.
+1. **Run boundary reached** (§7) — Phase A complete; clean halt; agent sets
+   `**Run status:** complete`, supervisor relays success.
 2. **STOP gate triggered** — agent writes + pushes the blocker doc and halts;
    supervisor relays a blocker heartbeat and waits for adjudication (§6).
 3. **Subphase exceeds 2× its cycle/active-hour budget** (§3) — blocker doc.

@@ -1,4 +1,5 @@
 .nightfall/
+.DS_Store
 build/
 build-sanitize/
 __pycache__/
