@@ -1,9 +1,7 @@
 # Current Phase
 
-Manual Phase 2 ABI and gate hardening is complete. Phase 3, the first-agent
-checkpoint, is next. The autonomous supervisor is available, but current work is
-proceeding through local build/test/gate commands with issues addressed as they
-appear.
+Phase 3 first-agent checkpoint is complete. The Phases 0-3 spike boundary has
+been reached, and Phase 4 has not been started.
 
 ## Status
 
@@ -79,6 +77,17 @@ appear.
 - `scripts/ci/run-local.sh` passes with the adjudicated ASan warning and existing
   non-blocking dependency-pin warning.
 
+## Phase 3 Completion
+
+- Phase 2 merged via PR #1 with the required `local-gates` GitHub check passing.
+- Active blocker directory is clear; resolved blockers preserve the ASan and
+  branch-protection adjudication trail.
+- Preflight passes on the macOS build host with the Slack notification test
+  enabled via the local launch environment.
+- Local gate suite passes on the macOS build host.
+- `docs/phase-3-checklist.md` records the checkpoint evidence.
+- No Phase 4 work has begun.
+
 ## Spike status
 
-In progress.
+**Spike status:** complete
