@@ -1,0 +1,68 @@
+# Nightfall dependency and toolchain source-of-truth.
+#
+# Bootstrap status:
+# The accepted policy is "latest stable as of bootstrap date, with exact hashes
+# recorded here once provisioning/network access is available." This file exists
+# so the repo has a durable, reviewable manifest shape before vendoring begins.
+
+[policy]
+bootstrap_date = "2026-05-28"
+selection_rule = "latest stable release or tag as of bootstrap date"
+change_control = "DEP-UPDATE commit tag required for changes"
+bootstrap_policy_accepted = true
+exact_pins_materialized = false
+
+[dependencies.musashi]
+kind = "git"
+role = "68k CPU emulation"
+selection_status = "policy-approved pending exact commit"
+
+[dependencies.nlohmann_json]
+kind = "release"
+role = "JSON support"
+selection_status = "policy-approved pending exact tag"
+
+[dependencies.glsl_crt]
+kind = "git"
+role = "shader CRT support"
+selection_status = "policy-approved pending exact commit"
+
+[tools.vasm]
+kind = "tool"
+role = "68k fixture assembler"
+selection_status = "installed for Phase 1"
+version = "vasm 1.8e"
+backend = "vasm M68k/CPU32/ColdFire cpu backend 2.3c"
+syntax_module = "vasm motorola syntax module 3.12"
+installed_binary = "vasmm68k_mot"
+
+[tools.libabigail]
+kind = "tool"
+role = "ABI diff tooling"
+selection_status = "policy-approved pending exact version and Mach-O validation"
+
+[toolchain.doctest]
+kind = "header-only test framework"
+decision = "selected"
+version = "v2.5.2"
+tag_commit = "6804767ee637789db8a5cb281381cae98dc36906"
+published_at = "2026-04-14T10:41:26Z"
+source = "https://github.com/doctest/doctest"
+vendored_header = "third_party/doctest/doctest.h"
+
+[toolchain.libfuzzer]
+kind = "fuzz engine"
+decision = "selected"
+
+[toolchain.sanitizers]
+required = ["asan", "ubsan"]
+best_effort = ["tsan"]
+
+[toolchain.xcodegen]
+kind = "project generator"
+decision = "selected"
+
+[build_host]
+target = "smugglebook"
+os = "macOS 26"
+arch = "arm64"

@@ -1,0 +1,37 @@
+# Structured trace event schema for early Nightfall core bring-up.
+
+[events."context.create"]
+category = "core"
+value = "initial tick count"
+
+[events."context.tick"]
+category = "core"
+value = "cumulative tick count"
+
+[events."context.destroy"]
+category = "core"
+value = "final tick count"
+
+[events."trap.register"]
+category = "core"
+value = "registered A-line trap word"
+
+[events."trap.dispatch"]
+category = "core"
+value = "dispatched A-line trap word"
+
+[events."trap.unimplemented"]
+category = "core"
+value = "unimplemented A-line trap word"
+
+[events."fixture.return"]
+category = "core"
+value = "RTS word that stopped a fixture run"
+
+[events."fixture.unsupported"]
+category = "core"
+value = "unsupported fixture instruction word"
+
+[events."fixture.incomplete"]
+category = "core"
+value = "last word in a fixture stream that ended without RTS"

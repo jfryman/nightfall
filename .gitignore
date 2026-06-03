@@ -1,0 +1,5 @@
+.nightfall/
+build/
+build-sanitize/
+__pycache__/
+*.pyc

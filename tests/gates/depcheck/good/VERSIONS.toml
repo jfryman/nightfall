@@ -1,0 +1,37 @@
+[policy]
+bootstrap_date = "2026-05-28"
+selection_rule = "fixture"
+change_control = "fixture"
+bootstrap_policy_accepted = true
+exact_pins_materialized = true
+
+[dependencies.musashi]
+kind = "git"
+
+[dependencies.nlohmann_json]
+kind = "release"
+
+[dependencies.glsl_crt]
+kind = "git"
+
+[tools.vasm]
+kind = "tool"
+
+[tools.libabigail]
+kind = "tool"
+
+[toolchain.doctest]
+decision = "selected"
+
+[toolchain.libfuzzer]
+decision = "selected"
+
+[toolchain.sanitizers]
+required = ["asan", "ubsan"]
+best_effort = ["tsan"]
+
+[toolchain.xcodegen]
+decision = "selected"
+
+[build_host]
+target = "fixture"

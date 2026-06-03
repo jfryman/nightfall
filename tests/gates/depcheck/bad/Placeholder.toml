@@ -1,0 +1,6 @@
+[policy]
+bootstrap_date = "2026-05-28"
+selection_rule = "<pin>"
+change_control = "fixture"
+bootstrap_policy_accepted = true
+exact_pins_materialized = true
