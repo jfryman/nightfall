@@ -12,6 +12,7 @@
 #
 # Backend is chosen by NF_NOTIFY_BACKEND (default: slack):
 #   slack    NIGHTFALL_SLACK_WEBHOOK=<incoming-webhook-url>
+#            or macOS Keychain service nightfall/slack-webhook, account $USER
 #   ntfy     NTFY_URL=https://ntfy.sh/<topic> (or self-hosted)  [NTFY_TOKEN optional]
 #   pushover PUSHOVER_TOKEN=<app>  PUSHOVER_USER=<user/group key>
 #   webhook  NF_WEBHOOK_URL=<url>   (POSTs {"text":..,"severity":..})
@@ -39,10 +40,26 @@ title="Nightfall"
 text="[nightfall] $msg"
 json_esc() { printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'; }
 
+slack_hook_from_keychain() {
+  command -v security >/dev/null 2>&1 || return 1
+
+  local service="${NF_SLACK_WEBHOOK_KEYCHAIN_SERVICE:-nightfall/slack-webhook}"
+  local account="${NF_SLACK_WEBHOOK_KEYCHAIN_ACCOUNT:-${USER:-}}"
+  if [ -n "$account" ]; then
+    security find-generic-password -a "$account" -s "$service" -w 2>/dev/null
+  else
+    security find-generic-password -s "$service" -w 2>/dev/null
+  fi
+}
+
 case "$backend" in
   slack)
     hook="${NIGHTFALL_SLACK_WEBHOOK:-}"
-    if [ -z "$hook" ]; then echo "notify(slack): NIGHTFALL_SLACK_WEBHOOK unset" >&2; exit 0; fi
+    if [ -z "$hook" ]; then hook="$(slack_hook_from_keychain || true)"; fi
+    if [ -z "$hook" ]; then
+      echo "notify(slack): NIGHTFALL_SLACK_WEBHOOK unset and Keychain item missing" >&2
+      exit 0
+    fi
     curl -sS --max-time 8 -X POST -H 'Content-type: application/json' \
       --data "{\"text\":\"$(json_esc "$text")\"}" "$hook" >/dev/null 2>&1 || true
     ;;
