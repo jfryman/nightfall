@@ -46,7 +46,11 @@ keeps CI/branch protection as the mechanical safety rail for autonomous work.
 
 ## Adjudication
 
-**Decision:** pending
-**Rationale:** pending
-**Decisions-log entry:** pending
-**Resume:** no
+**Decision:** Configure branch protection to require the `local-gates` status
+check and add `.github/workflows/nightfall-ci.yml` to run
+`scripts/ci/run-local.sh` on the self-hosted macOS runner.
+**Rationale:** This restores the mechanical self-merge-on-green gate required by
+the plan. The preflight merge gate now passes with one required status check.
+**Decisions-log entry:** Not a new project decision; this applies the existing
+self-merge-on-green decision.
+**Resume:** yes

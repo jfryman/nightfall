@@ -44,7 +44,13 @@ known false-red required gate.
 
 ## Adjudication
 
-**Decision:** pending
-**Rationale:** pending
-**Decisions-log entry:** pending
-**Resume:** no
+**Decision:** Option 2: temporarily mark ASan best-effort on this macOS 26.5 host,
+with UBSan required-pass locally and ASan required again once the host/toolchain
+contains the upstream Darwin ASan runtime fix.
+**Rationale:** The failure occurs during ASan runtime initialization before
+Nightfall code executes and is corroborated by public upstream reports. This
+keeps Phase 2 moving without treating a known host/toolchain false-red as a
+Nightfall regression.
+**Decisions-log entry:** `docs/decisions-log.md` — 2026-06-03 ASan macOS 26.5
+host exception.
+**Resume:** yes

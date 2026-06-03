@@ -1,8 +1,9 @@
 # Current Phase
 
-Manual Phase 2 ABI and gate hardening is in progress. The autonomous supervisor is
-available, but current work is proceeding through local build/test/gate commands
-with issues addressed as they appear.
+Manual Phase 2 ABI and gate hardening is complete. Phase 3, the first-agent
+checkpoint, is next. The autonomous supervisor is available, but current work is
+proceeding through local build/test/gate commands with issues addressed as they
+appear.
 
 ## Status
 
@@ -55,10 +56,28 @@ with issues addressed as they appear.
 - Added `docs/phase-2-checklist.md` and `docs/sanitizers.md`.
 - UBSan passes locally through the dedicated sanitizer smoke harness; TSan is
   attempted and skipped when unsupported by the host toolchain.
-- ASan remains the open required Phase 2 item: allocator-using ASan binaries
-  deadlock during sanitizer runtime initialization on this macOS 26.5 host.
-  Minimal ASan probes and Mozilla Bug 2037587 corroborate this as a
-  runtime/toolchain issue rather than Nightfall code.
+- ASan is temporarily best-effort on this macOS 26.5 host by maintainer
+  adjudication. Allocator-using ASan binaries deadlock during sanitizer runtime
+  initialization before Nightfall code; minimal ASan probes and Mozilla Bug
+  2037587 corroborate this as a runtime/toolchain issue rather than Nightfall
+  code.
+- Added GitHub Actions `local-gates` workflow and configured branch protection to
+  require it, restoring the mechanical self-merge-on-green gate.
+
+## Phase 2 Completion
+
+- Mach-O-friendly ABI snapshot guard protects the public C header and exported
+  `nf_*` symbols.
+- ABI guard has known-good and known-bad meta-tests.
+- Trace, boundary, coverage, dependency, tool, lint, assembler, ABI, and
+  sanitizer meta-gates are wired into local verification.
+- UBSan passes as the required sanitizer profile; TSan is attempted and skipped
+  with a host/toolchain reason when unsupported.
+- ASan is temporarily best-effort on this macOS 26.5 host by the 2026-06-03
+  maintainer adjudication in `docs/decisions-log.md`.
+- `scripts/preflight.sh` passes with warnings only.
+- `scripts/ci/run-local.sh` passes with the adjudicated ASan warning and existing
+  non-blocking dependency-pin warning.
 
 ## Spike status
 

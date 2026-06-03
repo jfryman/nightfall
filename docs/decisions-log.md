@@ -140,6 +140,20 @@ the agent's prompt. **Consequences:** durable in-repo state remains the source o
 truth; the notify is a courtesy buzz. Revises the earlier "agent never touches
 Slack" stance.
 
+### 2026-06-03 — ASan macOS 26.5 host exception
+**Context:** Phase 2 requires ASan and UBSan, but on this macOS 26.5 host every
+tested ASan runtime that performs meaningful allocator/global/stack
+instrumentation deadlocks during sanitizer initialization before Nightfall code
+executes. UBSan passes, and the failure matches a public upstream compiler-rt
+Darwin ASan issue. **Decision:** ASan is temporarily best-effort only on this
+macOS 26.5 host; UBSan remains required-pass, and ASan becomes required-pass
+again once the host/toolchain contains the upstream compiler-rt fix. **Rationale:**
+this preserves local Phase 2 momentum without weakening the project-wide intent
+to require ASan on a functioning Darwin sanitizer runtime. **Consequences:**
+`scripts/ci/sanitizers.sh` may warn and continue for ASan timeouts on this host;
+the exception is documented in `docs/sanitizers.md` and was adjudicated in
+`docs/blockers/resolved/phase-2-asan-macos-26.md`.
+
 ---
 
 ### Open (not yet decided)

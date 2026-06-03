@@ -3,9 +3,10 @@
 Phase 2 requires sanitizer hardening. Current local status:
 
 - UBSan: required-pass and green via `scripts/ci/sanitizers.sh`.
-- ASan: not passing on this macOS 26.5 host. ASan-linked binaries that exercise
-  allocation can deadlock during ASan runtime initialization before Nightfall
-  code runs.
+- ASan: temporarily best-effort on this macOS 26.5 host by the 2026-06-03
+  decision in `docs/decisions-log.md`. ASan-linked binaries that exercise
+  allocation can deadlock during ASan runtime initialization before Nightfall code
+  runs.
 - TSan: best-effort by project decision.
 
 ## ASan Runtime Evidence
@@ -26,12 +27,9 @@ re-entry -> `__sanitizer::StaticSpinMutex::LockSlow`.
 The local sanitizer profile therefore runs a dedicated non-doctest smoke
 executable that links `nightfall_core` and exercises context creation, trap
 registration, fixture execution, and cleanup. UBSan passes through that harness;
-ASan currently times out and is reported as a warning so unrelated Phase 2 gates
-continue to run.
-
-Phase 2 completion still requires either a passing ASan profile on a working
-host/toolchain or an explicit decision changing ASan from required-pass for this
-host.
+ASan currently times out and is reported as an adjudicated host warning so
+unrelated Phase 2 gates continue to run. ASan remains required-pass again on a
+host/toolchain containing the upstream compiler-rt fix.
 
 ## External Corroboration
 
