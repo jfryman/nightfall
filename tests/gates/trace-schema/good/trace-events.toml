@@ -1,0 +1,3 @@
+[events."fixture.good"]
+category = "core"
+value = "fixture"
