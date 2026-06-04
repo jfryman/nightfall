@@ -22,6 +22,16 @@ BitMap default_screen_bits() {
   };
 }
 
+PixMap default_screen_pix_map() {
+  const BitMap screen_bits = default_screen_bits();
+  return PixMap{
+      screen_bits.base_addr,
+      screen_bits.row_bytes,
+      screen_bits.bounds,
+      32u,
+  };
+}
+
 bool is_nil(uint32_t address) {
   return address == kNilAddress;
 }
@@ -68,11 +78,13 @@ nf_status PortState::open_port(uint32_t port_address) {
   }
 
   const BitMap screen_bits = globals_.screen_bits;
+  const PixMap screen_pix_map = default_screen_pix_map();
   *port = GrafPort{
       port_address,
       true,
       0,
       screen_bits,
+      screen_pix_map,
       screen_bits.bounds,
       Region{true, screen_bits.bounds},
       Region{true, kWideOpenClip},

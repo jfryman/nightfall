@@ -251,3 +251,59 @@ Rules:
   `PtInRgn` (`A8E8`), `EmptyRgn` (`A8E2`), and `EqualRgn` (`A8E3`).
 - **Implemented from this source:** Phase 4.4 QuickDraw region and clipping
   trap-word constants for fixtures and internal dispatcher tests.
+
+## QuickDraw Bit Transfer
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 3, "QuickDraw Drawing Reference", "Copying Images", page 3-112,
+  mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-165.html`
+- **Consulted for:** `CopyBits` copies with source modes, clipping, and resizing;
+  `CopyMask` masks copy areas; both can operate on bitmaps or pixel maps.
+- **Implemented from this source:** Phase 4.5 models bounded bitmap/pixel-map
+  transfer between modeled graphics ports.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 3, "QuickDraw Drawing Reference", `CopyBits`, pages 3-113 to 3-115,
+  mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-166.html`
+- **Consulted for:** `CopyBits` source and destination bitmap parameters,
+  source/destination rectangles, source modes, optional mask region clipping,
+  scaling to destination rectangles, and clipping to destination bounds/current
+  port clipping.
+- **Implemented from this source:** Phase 4.5 `CopyBits` copies modeled 32-bit
+  pixels with nearest-neighbor scaling, basic source modes, optional mask-region
+  clipping, and current-port clipping.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 3, "QuickDraw Drawing Reference", `CopyMask`, page 3-115, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-167.html`
+- **Consulted for:** `CopyMask` transfers source pixels only where a supplied
+  mask bitmap/pixel map permits the copy, and uses source, mask, and destination
+  rectangles.
+- **Implemented from this source:** Phase 4.5 `CopyMask` copies modeled pixels
+  only where the modeled mask pixel is active.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 4, "Color QuickDraw", direct-device 32-bit pixel representation,
+  mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-198.html`
+- **Consulted for:** Phase 4's 32-bit direct-color assumption and pixel-map
+  treatment for color graphics ports.
+- **Implemented from this source:** Phase 4.5 adds a modeled 32-bit `PixMap`
+  alongside each modeled port's `BitMap`.
+
+- **Source:** Apple Computer, *Inside Macintosh X-Ref*, "System Traps", pages
+  63-77, preserved at:
+  `https://vintageapple.org/macprogramming/pdf/Inside_Macintosh_X-Ref_1988.pdf`
+- **Consulted for:** Trap word for `CopyBits` (`A8EC`).
+- **Implemented from this source:** Phase 4.5 `CopyBits` trap-word constant for
+  fixtures and trace assertions.
+
+- **Source:** Apple Computer, *Universal Interfaces*, `Quickdraw.h` for Mac OS 9,
+  mirrored at:
+  `https://www.cs.vu.nl/~eliens/research/media/lib-of-vs-libs-QTDevWin-CIncludes-Quickdraw.h.html`
+- **Consulted for:** Trap word for `CopyMask` (`A817`) in the public Apple
+  QuickDraw interface header.
+- **Implemented from this source:** Phase 4.5 `CopyMask` trap-word constant for
+  fixtures and trace assertions.
