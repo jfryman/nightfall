@@ -40,3 +40,67 @@ Rules:
   Nightfall trap scaffold, and treats `RTS` as the stop marker for the bootstrap
   fixture runner. It does not implement stack effects, registers, or general
   MC68000 instruction semantics.
+
+## QuickDraw Port State
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 2, "Basic QuickDraw Reference", "InitGraf", page 2-34, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-30.html`
+- **Consulted for:** `InitGraf` initializes QuickDraw globals, stores the
+  `thePort` global pointer, sets `thePort` to `NIL`, initializes the standard
+  white/black/gray patterns, initializes `screenBits`, and initializes
+  `randSeed` to `1`.
+- **Implemented from this source:** Phase 4.1 `InitGraf` stores a modeled
+  QuickDraw global pointer and initializes Nightfall's modeled QuickDraw globals.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 2, "Basic QuickDraw Reference", "OpenPort", page 2-35, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-32.html`
+- **Consulted for:** `OpenPort` initializes a `GrafPort`, initializes visible
+  and clipping regions, gives the port the documented initial drawing state, and
+  makes it the current port by calling `SetPort`.
+- **Implemented from this source:** Phase 4.1 `OpenPort` initializes the modeled
+  `GrafPort` fields needed by later QuickDraw drawing phases and makes that port
+  current.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 2, "Basic QuickDraw Reference", "ClosePort", page 2-36, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-34.html`
+- **Consulted for:** `ClosePort` releases a basic graphics port's visible and
+  clipping regions.
+- **Implemented from this source:** Phase 4.1 `ClosePort` marks the modeled
+  visible and clipping regions released while preserving the `GrafPort` record
+  itself.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 2, "Basic QuickDraw Reference", "GetPort", page 2-39, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-36.html`
+- **Consulted for:** `GetPort` returns the current graphics port pointer in the
+  caller-provided parameter.
+- **Implemented from this source:** Phase 4.1 `GetPort` returns Nightfall's
+  modeled current port address.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 2, "Basic QuickDraw Reference", "SetPort", page 2-39, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-37.html`
+- **Consulted for:** `SetPort` sets the current graphics port; drawing routines
+  use the bitmap and local coordinate system of that current port.
+- **Implemented from this source:** Phase 4.1 `SetPort` updates Nightfall's
+  modeled current port pointer.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 2, "Basic QuickDraw Reference", "SetPortBits", page 2-42, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-47.html`
+- **Consulted for:** `SetPortBits` replaces the `portBits` field of the current
+  basic graphics port with a previously prepared `BitMap`.
+- **Implemented from this source:** Phase 4.1 `SetPortBits` replaces the modeled
+  current port's `BitMap`.
+
+- **Source:** Apple Computer, *Inside Macintosh X-Ref*, "System Traps", pages
+  63-76, especially page 76 for QuickDraw trap words, preserved at:
+  `https://vintageapple.org/macprogramming/pdf/Inside_Macintosh_X-Ref_1988.pdf`
+- **Consulted for:** Trap words for `InitPort` (`A86D`), `InitGraf` (`A86E`),
+  `OpenPort` (`A86F`), `SetPort` (`A873`), `GetPort` (`A874`), `SetPBits` /
+  `SetPortBits` (`A875`), and `ClosePort` (`A87D`).
+- **Implemented from this source:** Phase 4.1 QuickDraw trap-word constants for
+  the fixture and internal dispatcher tests.
