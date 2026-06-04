@@ -13,7 +13,7 @@
 
 ## Recent completions
 
-- Phase 4.5 completed 2026-06-04 by PR pending: QuickDraw `CopyBits` and
+- Phase 4.5 completed 2026-06-04 by PR #13: QuickDraw `CopyBits` and
   `CopyMask` implemented with 32-bit `PixMap` modeling, co-located tests,
   fixture, citations, validation log, mode coverage, scaling, masks, and pixel
   state assertions.
