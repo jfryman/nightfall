@@ -38,7 +38,7 @@ VERSIONS_FILE="${NF_VERSIONS_FILE:-third_party/VERSIONS.toml}"
 TEST_NOTIFY=0
 
 # Tools the build needs across Phase A (some not used until later phases).
-#   name|hard|why
+#   name|hard|why|install hint
 REQUIRED_TOOLS=(
   "git|1|version control"
   "gh|1|PR creation + self-merge-on-green"
@@ -46,7 +46,7 @@ REQUIRED_TOOLS=(
   "cmake|1|builds libnightfall (C++ authority)"
   "xcodegen|1|generates Nightfall.xcodeproj"
   "clang|1|C++17 + libFuzzer (-fsanitize=fuzzer)"
-  "vasm|1|assembles 68k .AD fixtures (Phase 1)"
+  "vasmm68k_mot|1|assembles 68k .AD fixtures (Phase 1)|install vasm from source or a package that provides vasmm68k_mot"
   "jq|1|parsing gh api responses in CI scripts"
   "abidiff|0|abi-guard ABI gate (see note re: Mach-O below)"
 )
@@ -167,13 +167,14 @@ fi
 # ---------------------------------------------------------------------------
 section "2. Toolchain"
 for entry in "${REQUIRED_TOOLS[@]}"; do
-  IFS='|' read -r tool hard why <<<"$entry"
+  IFS='|' read -r tool hard why hint <<<"$entry"
+  hint="${hint:-install $tool (e.g. brew install $tool)}"
   if have "$tool"; then
     pass "$tool present  ${C_DIM}($why)${C_OFF}"
   elif [ "$hard" = "1" ]; then
-    fail "$tool missing  ($why)" "install $tool (e.g. brew install $tool)"
+    fail "$tool missing  ($why)" "$hint"
   else
-    warn "$tool missing  ($why)" "install $tool when its phase is reached"
+    warn "$tool missing  ($why)" "$hint when its phase is reached"
   fi
 done
 

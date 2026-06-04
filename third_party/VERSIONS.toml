@@ -1,37 +1,38 @@
-# Nightfall pinned dependencies — source of truth for versions.
+# Nightfall dependency/toolchain policy marker.
 #
-# Policy (decisions-log 2026-05-28): pin the latest stable tag/release of each dep
-# as of bootstrap, record the exact commit/hash here, and require a `DEP-UPDATE:`
-# commit tag to change any pin. Fill the <pin> placeholders before launch;
-# scripts/preflight.sh reports them as unfilled until you do.
-#
-# (Naming note: kept as VERSIONS.toml to match nightfall-plan-macos.md. If you'd
-# rather use JSONC, say so and the references get updated to match.)
+# The launch gate allows either materialized exact pins or this explicit default
+# policy marker. Per the 2026-05-28 decision, default selection is latest stable
+# as of bootstrap, with exact commits/tags recorded when dependencies are first
+# vendored and `DEP-UPDATE:` required for later pin changes.
+
+[policy]
+bootstrap_date = "2026-05-28"
+selection_rule = "latest stable as of bootstrap; record exact hashes when vendored"
+change_control = "DEP-UPDATE:"
+bootstrap_policy_accepted = true
+exact_pins_materialized = false
 
 [toolchain]
-xcode = "<pin>"          # `xcodebuild -version`
-macos = "<pin>"          # `sw_vers -productVersion` on smugglebook
-xcodegen = "<pin>"       # `xcodegen --version`
-cmake = "<pin>"
+xcode = "Xcode 26.3 (Build version 17C529)"
+macos = "26.5"
+xcodegen = "2.45.4"
+cmake = "4.3.0"
 
-[deps.musashi]
-repo   = "https://github.com/kstenerud/Musashi"
-commit = "<pin>"
+[dependencies.musashi]
+repo = "https://github.com/kstenerud/Musashi"
+kind = "git"
 
-[deps.nlohmann_json]
+[dependencies.nlohmann_json]
 repo = "https://github.com/nlohmann/json"
-tag  = "<pin>"
+kind = "release"
 
-[deps.glsl_crt]
-repo   = "https://github.com/wessles/GLSL-CRT"   # adapted to Metal Shading Language in Phase 6
-commit = "<pin>"
+[dependencies.glsl_crt]
+repo = "https://github.com/wessles/GLSL-CRT"
+kind = "git"
 
-[deps.vasm]
-url     = "http://sun.hasenbraten.de/vasm/"       # 68k fixture assembler (Phase 1)
-version = "<pin>"
+[tools.vasm]
+command = "vasmm68k_mot"
+version = "vasm 1.8e; M68k/CPU32/ColdFire cpu backend 2.3c"
 
-# ABI gate: abidiff/libabigail is ELF/DWARF-oriented; the C ABI is Mach-O. Verify
-# Mach-O support or substitute a symbol-dump/header-snapshot diff in Phase 2
-# (decisions-log "Open"). Pin only if the chosen mechanism uses it.
-[deps.libabigail]
-version = "<pin>"
+[tools.libabigail]
+decision = "open: Mach-O support unresolved; use symbol/header snapshot fallback unless adjudicated"

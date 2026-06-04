@@ -36,3 +36,9 @@ project policy, and restore `docs/blockers/TEMPLATE.md`. Then rerun
 ## Resume
 
 Resume only after an adjudication block is appended below with `**Resume:** yes`.
+
+## Adjudication 2026-06-03
+
+Maintainer authorized unblocking the preflight failures in-session.
+
+**Resume:** yes
