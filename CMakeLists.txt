@@ -10,6 +10,7 @@ add_library(nightfall_core STATIC
   core/QuickDrawPort.cpp
   core/QuickDrawBitTransfer.cpp
   core/QuickDrawLine.cpp
+  core/QuickDrawPicture.cpp
   core/QuickDrawRegion.cpp
   core/QuickDrawRect.cpp
   core/nightfall.cpp
@@ -32,6 +33,7 @@ add_executable(nightfall_core_tests
   core/QuickDrawPort.test.cpp
   core/QuickDrawBitTransfer.test.cpp
   core/QuickDrawLine.test.cpp
+  core/QuickDrawPicture.test.cpp
   core/QuickDrawRegion.test.cpp
   core/QuickDrawRect.test.cpp
   core/nightfall.test.cpp
@@ -63,3 +65,14 @@ add_executable(nightfall_core_sanitizer_smoke
 )
 
 target_link_libraries(nightfall_core_sanitizer_smoke PRIVATE nightfall_core)
+
+option(NIGHTFALL_ENABLE_FUZZERS "Build Nightfall libFuzzer targets" ON)
+
+if(NIGHTFALL_ENABLE_FUZZERS AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_executable(fuzz-pict EXCLUDE_FROM_ALL
+    core/QuickDrawPicture.fuzz.cpp
+  )
+  target_link_libraries(fuzz-pict PRIVATE nightfall_core)
+  target_compile_options(fuzz-pict PRIVATE -fsanitize=fuzzer)
+  target_link_options(fuzz-pict PRIVATE -fsanitize=fuzzer)
+endif()

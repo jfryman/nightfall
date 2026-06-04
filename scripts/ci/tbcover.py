@@ -14,7 +14,7 @@ IMPLEMENTATION_SUFFIXES = {".c", ".cc", ".cpp", ".cxx"}
 def is_implementation(path: pathlib.Path) -> bool:
     if path.suffix not in IMPLEMENTATION_SUFFIXES:
         return False
-    return not path.name.endswith(".test.cpp")
+    return not path.name.endswith(".test.cpp") and not path.name.endswith(".fuzz.cpp")
 
 
 def has_sibling(stem: pathlib.Path, suffix: str) -> bool:

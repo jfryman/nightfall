@@ -307,3 +307,42 @@ Rules:
   QuickDraw interface header.
 - **Implemented from this source:** Phase 4.5 `CopyMask` trap-word constant for
   fixtures and trace assertions.
+
+## QuickDraw PICT Streams
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 7, "Pictures", `Picture` record, mirrored at:
+  `https://leopard-adc.pepas.com/documentation/mac/QuickDraw/QuickDraw-337.html`
+- **Consulted for:** A `Picture` record begins with `picSize` and `picFrame`,
+  followed by picture opcode data, and `picFrame` is the bounding rectangle used
+  by `DrawPicture`.
+- **Implemented from this source:** Phase 4.6 prerequisite parser validates the
+  modeled PICT 2 record envelope before opcode coverage is considered.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Appendix A, "Picture Opcodes", mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-458.html`
+- **Consulted for:** The first opcode in a picture is the version opcode,
+  followed by the version number, and picture opcodes are the data consumed by
+  `DrawPicture`.
+- **Implemented from this source:** Phase 4.6 prerequisite generator and parser
+  emit and validate the PICT 2 version prelude.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Appendix A, "A Sample Version 2 Picture", mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-463.html`
+- **Consulted for:** Version 2 PICT streams begin with `VersionOp` `$0011`,
+  version `$02FF`, and `HeaderOp` `$0C00` with 24 bytes of header data, and end
+  with `OpEndPic` `$00FF`.
+- **Implemented from this source:** `tools/pict-gen/` emits the modeled version
+  2 prelude/header/end sequence, and `QuickDrawPicture` validates it.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Appendix A, "Opcodes in Pictures", Table A-2, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-461.html`
+- **Consulted for:** PICT 2 opcodes and data lengths for NOP, RGB foreground and
+  background colors, line, rectangle drawing operations, version/header, and
+  end-of-picture.
+- **Implemented from this source:** Phase 4.6 prerequisite `tools/pict-gen/`
+  coverage and `QuickDrawPicture` parser coverage for the initial opcode set
+  that `DrawPicture` will consume.

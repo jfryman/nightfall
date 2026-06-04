@@ -168,6 +168,22 @@ tree would silently weaken the unattended-loop guarantees. **Consequences:**
 Phase 4 proceeds on the restored Phase 3 foundation; the blocker is moved to
 `docs/blockers/resolved/`, and `docs/current-phase.md` now tracks Phase 4.1.
 
+### 2026-06-04 — Phase 4.6 PICT prerequisite backfill
+**Context:** Phase 4.6 requires `tools/pict-gen/` coverage and mandatory
+`fuzz-pict`, but those Phase 1 prerequisite artifacts were absent from the
+repository when Phase 4.6 started. The blocker at
+`docs/blockers/phase-4.6-missing-pict-prereqs.md` was adjudicated with
+`**Resume:** yes` for Option 2. **Decision:** backfill the missing PICT
+generator and in-repo libFuzzer target inside Phase 4.6 as prerequisite
+recovery, limited to the PICT 2 opcodes needed by the first `DrawPicture`
+validation slice: version/header, RGB foreground/background colors, line, and
+rectangle drawing opcodes. **Rationale:** this preserves Phase 4.6's validation
+contract while making the prior-phase boundary crossing explicit and auditable
+rather than silently weakening the gate. **Consequences:** `tools/pict-gen/`
+becomes the source of generated PICT 2 fixtures for Phase 4.6, `fuzz-pict` is
+wired as a libFuzzer target, and later PICT opcode coverage must grow generator,
+parser, and fuzzer coverage together.
+
 ---
 
 ### Open (not yet decided)

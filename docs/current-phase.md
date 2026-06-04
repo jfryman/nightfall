@@ -8,11 +8,15 @@
 **Active hours:** 0 / 24
 **Next expected deliverable:** docs/phase-4.6-validation.md
 **Agent(s) assigned:** codex-gpt-5
-**Last blocker:** docs/blockers/resolved/phase-4-missing-state-artifacts.md
+**Last blocker:** docs/blockers/resolved/phase-4.6-missing-pict-prereqs.md
 **Run status:** in progress
 
 ## Recent completions
 
+- Phase 4.6 PICT prerequisites backfilled 2026-06-04 after adjudication of
+  `docs/blockers/resolved/phase-4.6-missing-pict-prereqs.md`: `tools/pict-gen/`
+  now emits the initial PICT 2 fixture slice, `fuzz-pict` is wired through
+  CMake/libFuzzer, and the local gate suite runs the generator and fuzzer.
 - Phase 4.5 completed 2026-06-04 by PR #13: QuickDraw `CopyBits` and
   `CopyMask` implemented with 32-bit `PixMap` modeling, co-located tests,
   fixture, citations, validation log, mode coverage, scaling, masks, and pixel

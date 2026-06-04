@@ -99,6 +99,9 @@ run_tbcover() {
   local dir="$1"
   local src base missing=0
   while IFS= read -r src; do
+    case "$src" in
+      *.fuzz.cpp) continue ;;
+    esac
     base="${src%.cpp}"
     [ -f "$base.test.cpp" ] || { printf '%s missing .test.cpp\n' "$src" >&2; missing=1; }
     [ -f "$base.md" ] || { printf '%s missing .md\n' "$src" >&2; missing=1; }
@@ -152,8 +155,45 @@ run_abi_guard() {
   cmp -s "$dir/nightfall.h" "$dir/nightfall.h.snapshot" || return 1
 }
 
+run_pict_gen_tests() {
+  python3 tools/pict-gen/test_pict_gen.py
+  rm -rf build-pict-gen
+  mkdir -p build-pict-gen
+  python3 tools/pict-gen/pict-gen.py \
+    tools/pict-gen/examples/basic.yaml \
+    build-pict-gen/basic.pict \
+    --coverage \
+    --rez-output build-pict-gen/basic.r \
+    --resource-id 129 >/tmp/nightfall-pict-gen.coverage
+  grep -q '^paint_rect$' /tmp/nightfall-pict-gen.coverage
+  test -s build-pict-gen/basic.pict
+  grep -q "data 'PICT' (129)" build-pict-gen/basic.r
+}
+
+run_fuzz_pict() {
+  local runs="${NF_FUZZ_PICT_RUNS:-1000000}"
+  local fuzz_cxx="${NIGHTFALL_FUZZ_CXX:-}"
+  if [ -z "$fuzz_cxx" ] && [ -x /opt/homebrew/opt/llvm/bin/clang++ ]; then
+    fuzz_cxx=/opt/homebrew/opt/llvm/bin/clang++
+  fi
+  if [ -z "$fuzz_cxx" ]; then
+    fuzz_cxx="$(command -v clang++)"
+  fi
+  rm -rf build-fuzz
+  cmake -S . -B build-fuzz \
+    -DNIGHTFALL_ENABLE_FUZZERS=ON \
+    -DCMAKE_CXX_COMPILER="$fuzz_cxx"
+  cmake --build build-fuzz --target fuzz-pict
+  mkdir -p build-fuzz/pict-corpus
+  python3 tools/pict-gen/pict-gen.py \
+    tools/pict-gen/examples/basic.yaml \
+    build-fuzz/pict-corpus/basic.pict >/dev/null
+  build-fuzz/fuzz-pict -runs="$runs" build-fuzz/pict-corpus
+}
+
 require_tool cmake
 require_tool ctest
+require_tool python3
 require_tool rg
 require_tool vasmm68k_mot
 
@@ -172,6 +212,9 @@ expect_success "boundary core" run_boundary_check core
 expect_success "tbcover good fixture" run_tbcover tests/gates/tbcover/good
 expect_failure "tbcover missing doc fixture" run_tbcover tests/gates/tbcover/bad
 expect_success "tbcover core" run_tbcover core
+
+expect_success "pict-gen tests" run_pict_gen_tests
+expect_success "fuzz-pict" run_fuzz_pict
 
 expect_success "asm good fixture" run_asm_fixture tests/gates/asm-fixtures/good/smoke.fixture.s
 expect_failure "asm bad fixture" run_asm_fixture tests/gates/asm-fixtures/bad/broken.fixture.s
