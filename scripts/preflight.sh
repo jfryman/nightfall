@@ -57,6 +57,8 @@ REQUIRED_PATHS=(
   "docs/blockers/TEMPLATE.md|1|STOP-gate blocker template"
   "docs/autonomous-operation.md|1|loop contract"
   "docs/preflight.md|0|human provisioning checklist"
+  "docs/current-phase.md|1|phase tracker — reconciliation needs it"
+  "docs/decisions-log.md|1|binding-decision record"
 )
 
 # Hosts the bootstrap must reach (vendoring + GitHub + Slack).
