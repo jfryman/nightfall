@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(nightfall_core STATIC
   core/QuickDrawPort.cpp
+  core/QuickDrawRect.cpp
   core/nightfall.cpp
 )
 
@@ -26,6 +27,7 @@ enable_testing()
 
 add_executable(nightfall_core_tests
   core/QuickDrawPort.test.cpp
+  core/QuickDrawRect.test.cpp
   core/nightfall.test.cpp
 )
 

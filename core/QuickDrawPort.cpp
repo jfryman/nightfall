@@ -83,12 +83,17 @@ nf_status PortState::open_port(uint32_t port_address) {
       0,
       kBlackColor,
       kWhiteColor,
+      RGBColor{0x0000u, 0x0000u, 0x0000u},
+      RGBColor{0xFFFFu, 0xFFFFu, 0xFFFFu},
+      kBlackPixel,
+      kWhitePixel,
       0,
       0,
       kNilAddress,
       kNilAddress,
       kNilAddress,
       kNilAddress,
+      {},
   };
   return set_port(port_address);
 }
@@ -179,6 +184,21 @@ const GrafPort *PortState::find_port(uint32_t port_address) const {
     }
   }
   return nullptr;
+}
+
+uint32_t PortState::pixel(uint32_t port_address, int16_t v, int16_t h) const {
+  const GrafPort *port = find_port(port_address);
+  if (port == nullptr || v < 0 || h < 0) {
+    return 0u;
+  }
+
+  const auto row = static_cast<size_t>(v);
+  const auto column = static_cast<size_t>(h);
+  if (row >= kMaxModeledBitmapHeight || column >= kMaxModeledBitmapWidth) {
+    return 0u;
+  }
+
+  return port->pixels[(row * kMaxModeledBitmapWidth) + column];
 }
 
 size_t PortState::trace_count() const {
