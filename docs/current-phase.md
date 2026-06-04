@@ -13,7 +13,7 @@
 
 ## Recent completions
 
-- Phase 4.4 completed 2026-06-04 by PR pending: QuickDraw region and clipping
+- Phase 4.4 completed 2026-06-04 by PR #12: QuickDraw region and clipping
   traps implemented with co-located tests, fixture, citations, validation log,
   and region-structure assertions.
 - Phase 4.3 completed 2026-06-04 by PR #11: QuickDraw line and pen-location
