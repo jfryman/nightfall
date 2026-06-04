@@ -70,3 +70,16 @@ Resume only after the maintainer appends an adjudication block below with
 Decision:
 
 **Resume:** no
+
+## Adjudication 2026-06-04 — Option 2
+
+**Decision:** Option 2: authorize the agent to backfill Phase 1
+`tools/pict-gen/` and the in-repo `fuzz-pict` libFuzzer target as Phase 4.6
+prerequisites, with the smallest PICT 2 opcode set needed for Phase 4.6
+validation.
+**Rationale:** Required prior artifacts are absent from the repo; backfilling
+them is accepted as prerequisite recovery for this phase so Phase 4.6 can
+continue without weakening its validation contract.
+**Decisions-log entry:** `docs/decisions-log.md`, "2026-06-04 — Phase 4.6
+PICT prerequisite backfill".
+**Resume:** yes

@@ -1,0 +1,10 @@
+frame: [0, 0, 16, 16]
+ops:
+  - rgb_fore_color: [65535, 0, 0]
+  - rgb_back_color: [0, 0, 0]
+  - line: [0, 0, 15, 15]
+  - frame_rect: [0, 0, 16, 16]
+  - paint_rect: [2, 2, 8, 8]
+  - erase_rect: [8, 8, 12, 12]
+  - invert_rect: [4, 4, 10, 10]
+  - fill_rect: [1, 1, 3, 3]
