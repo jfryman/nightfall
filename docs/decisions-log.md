@@ -154,6 +154,20 @@ to require ASan on a functioning Darwin sanitizer runtime. **Consequences:**
 the exception is documented in `docs/sanitizers.md` and was adjudicated in
 `docs/blockers/resolved/phase-2-asan-macos-26.md`.
 
+### 2026-06-04 — Recovery: restore Phase 0-3 artifacts
+**Context:** `d3a6047` deleted Phase 0-3 paper-trail artifacts and gate scripts
+that were present at the Phase 3 checkpoint, leaving reconciliation unable to
+establish the Phase 4 starting state. The blocker at
+`docs/blockers/resolved/phase-4-missing-state-artifacts.md` was adjudicated with
+`**Resume:** yes`. **Decision:** restore the deleted durable artifacts and gate
+scripts from the Phase 3 checkpoint, keeping the later scope-lift governance
+edits. The deletions were unintentional collateral, not the intended Phase 4
+baseline. **Rationale:** Phase 4 depends on the Phase 3 trap-log, clean-room
+paper trail, gate scripts, and phase-tracking history; proceeding from a smaller
+tree would silently weaken the unattended-loop guarantees. **Consequences:**
+Phase 4 proceeds on the restored Phase 3 foundation; the blocker is moved to
+`docs/blockers/resolved/`, and `docs/current-phase.md` now tracks Phase 4.1.
+
 ---
 
 ### Open (not yet decided)
