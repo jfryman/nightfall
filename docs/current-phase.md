@@ -1,14 +1,14 @@
 # Nightfall — Current Phase
 
 **Current phase:** 4.6
-**Status:** In progress
+**Status:** Blocked
 **Started:** 2026-06-04
 **Timebox:** 18 cycles / 24 active hours
 **Cycle count:** 0 / 18
 **Active hours:** 0 / 24
 **Next expected deliverable:** docs/phase-4.6-validation.md
 **Agent(s) assigned:** codex-gpt-5
-**Last blocker:** docs/blockers/resolved/phase-4-missing-state-artifacts.md
+**Last blocker:** docs/blockers/phase-4.6-missing-pict-prereqs.md
 **Run status:** in progress
 
 ## Recent completions
