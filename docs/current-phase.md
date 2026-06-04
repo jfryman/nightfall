@@ -13,7 +13,7 @@
 
 ## Recent completions
 
-- Phase 4.3 completed 2026-06-04 by PR pending: QuickDraw line and pen-location
+- Phase 4.3 completed 2026-06-04 by PR #11: QuickDraw line and pen-location
   traps implemented with co-located tests, fixture, citations, validation log,
   and scanline state assertions.
 - Phase 4.2 completed 2026-06-04 by PR #10: QuickDraw rectangle drawing and
