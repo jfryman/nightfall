@@ -36,3 +36,17 @@ version = "vasm 1.8e; M68k/CPU32/ColdFire cpu backend 2.3c"
 
 [tools.libabigail]
 decision = "open: Mach-O support unresolved; use symbol/header snapshot fallback unless adjudicated"
+
+[toolchain.doctest]
+decision = "selected"
+version = "2.5.2"
+
+[toolchain.libfuzzer]
+decision = "selected"
+
+[toolchain.sanitizers]
+required = ["asan", "ubsan"]
+best_effort = ["tsan"]
+
+[toolchain.xcodegen]
+decision = "selected"
