@@ -26,6 +26,13 @@ bool is_nil(uint32_t address) {
   return address == kNilAddress;
 }
 
+Point packed_point(uint32_t value) {
+  return Point{
+      static_cast<int16_t>((value >> 16u) & 0xFFFFu),
+      static_cast<int16_t>(value & 0xFFFFu),
+  };
+}
+
 }  // namespace
 
 // Source: docs/clean-room-sources.md, "QuickDraw Port State".
@@ -168,6 +175,22 @@ nf_status PortState::dispatch(uint16_t trap_word, uint32_t argument_address) {
       });
     case kTrapGetPort:
       return argument_address == kNilAddress ? NF_ERROR_INVALID_ARGUMENT : NF_OK;
+    case kTrapMoveTo: {
+      const Point point = packed_point(argument_address);
+      return move_to(point.h, point.v);
+    }
+    case kTrapMove: {
+      const Point delta = packed_point(argument_address);
+      return move(delta.h, delta.v);
+    }
+    case kTrapLineTo: {
+      const Point point = packed_point(argument_address);
+      return line_to(point.h, point.v);
+    }
+    case kTrapLine: {
+      const Point delta = packed_point(argument_address);
+      return line(delta.h, delta.v);
+    }
     default:
       return NF_ERROR_UNIMPLEMENTED;
   }
