@@ -64,13 +64,25 @@ Agent recommendation: Option 1. Phase 4 depends on the Phase 3 trap-log and
 state-tracking paper trail, and restoring the last known checkpoint avoids
 silently weakening the unattended-loop guarantees.
 
+### 2026-06-04 — Recovery: restore Phase 0–3 artifacts deleted in d3a6047
+**Context:** d3a6047 (main tip) had deleted the Phase 0–3 paper trail and gate
+scripts present at the Phase 3 checkpoint 39169ee; reconciliation could not
+establish phase state. **Decision:** restore the deleted artifacts from 39169ee
+onto the current tip, preserving the scope-lift governance edits. Deletions were
+unintentional, not a new baseline. **Consequences:** Phase 4 proceeds on the
+intact Phase 3 foundation; unattended-loop guarantees preserved.
+
 ## Resume
 
 Resume only after the maintainer appends an adjudication block below with
 `**Resume:** yes`.
 
 ## Adjudication 2026-06-04
-
-Decision:
-
-**Resume:** no
+**Decision:** Option 1 — restored the deleted Phase 0–3 durable artifacts and gate
+scripts from checkpoint 39169ee, keeping the scope-lift edits. current-phase.md
+advanced to Phase 4; decisions-log updated. The d3a6047 deletions were
+unintentional collateral, not an intended baseline.
+**Rationale:** Phase 4 depends on the Phase 3 trap-log and the state-tracking
+paper trail; restoring the checkpoint preserves the loop guarantees.
+**Decisions-log entry:** 2026-06-04 — Recovery: restore Phase 0–3 artifacts.
+**Resume:** yes
