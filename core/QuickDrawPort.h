@@ -24,6 +24,7 @@ constexpr uint16_t kTrapPaintRect = 0xA8A2u;
 constexpr uint16_t kTrapEraseRect = 0xA8A3u;
 constexpr uint16_t kTrapInvertRect = 0xA8A4u;
 constexpr uint16_t kTrapFillRect = 0xA8A5u;
+constexpr uint16_t kTrapCopyMask = 0xA817u;
 constexpr uint16_t kTrapLineTo = 0xA891u;
 constexpr uint16_t kTrapLine = 0xA892u;
 constexpr uint16_t kTrapMoveTo = 0xA893u;
@@ -42,6 +43,7 @@ constexpr uint16_t kTrapSectRgn = 0xA8E4u;
 constexpr uint16_t kTrapUnionRgn = 0xA8E5u;
 constexpr uint16_t kTrapDiffRgn = 0xA8E6u;
 constexpr uint16_t kTrapPtInRgn = 0xA8E8u;
+constexpr uint16_t kTrapCopyBits = 0xA8ECu;
 
 constexpr uint32_t kNilAddress = 0u;
 constexpr uint32_t kDefaultScreenWidth = 640u;
@@ -51,7 +53,14 @@ constexpr uint16_t kMaxModeledBitmapWidth = 64u;
 constexpr uint16_t kMaxModeledBitmapHeight = 64u;
 constexpr size_t kMaxModeledPixels = static_cast<size_t>(kMaxModeledBitmapWidth) * kMaxModeledBitmapHeight;
 constexpr int16_t kPatCopy = 8;
+constexpr int16_t kSrcCopy = 0;
 constexpr int16_t kSrcOr = 1;
+constexpr int16_t kSrcXor = 2;
+constexpr int16_t kSrcBic = 3;
+constexpr int16_t kNotSrcCopy = 4;
+constexpr int16_t kNotSrcOr = 5;
+constexpr int16_t kNotSrcXor = 6;
+constexpr int16_t kNotSrcBic = 7;
 constexpr int32_t kBlackColor = 0x00000021;
 constexpr int32_t kWhiteColor = 0x0000001E;
 constexpr int32_t kRedColor = 0x000000CD;
@@ -88,6 +97,13 @@ struct BitMap {
   Rect bounds;
 };
 
+struct PixMap {
+  uint32_t base_addr;
+  uint16_t row_bytes;
+  Rect bounds;
+  uint16_t pixel_size;
+};
+
 struct Region {
   bool allocated;
   Rect bounds;
@@ -100,6 +116,7 @@ struct GrafPort {
   bool open;
   int16_t device;
   BitMap port_bits;
+  PixMap port_pix_map;
   Rect port_rect;
   Region vis_rgn;
   Region clip_rgn;
@@ -178,6 +195,18 @@ class PortState {
   nf_status pt_in_rgn(Point point, uint32_t region_address, bool *out_contains) const;
   nf_status set_clip(uint32_t region_address);
   nf_status get_clip(uint32_t region_address);
+  nf_status copy_bits(uint32_t source_port_address,
+                      uint32_t destination_port_address,
+                      const Rect &source_rect,
+                      const Rect &destination_rect,
+                      int16_t mode,
+                      uint32_t mask_region_address);
+  nf_status copy_mask(uint32_t source_port_address,
+                      uint32_t mask_port_address,
+                      uint32_t destination_port_address,
+                      const Rect &source_rect,
+                      const Rect &mask_rect,
+                      const Rect &destination_rect);
   nf_status dispatch(uint16_t trap_word, uint32_t argument_address);
 
   const QuickDrawGlobals &globals() const;
