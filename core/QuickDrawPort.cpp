@@ -209,6 +209,15 @@ const GrafPort *PortState::find_port(uint32_t port_address) const {
   return nullptr;
 }
 
+const Region *PortState::find_region(uint32_t region_address) const {
+  for (const Region &region : regions_) {
+    if (region.allocated && region.address == region_address) {
+      return &region;
+    }
+  }
+  return nullptr;
+}
+
 uint32_t PortState::pixel(uint32_t port_address, int16_t v, int16_t h) const {
   const GrafPort *port = find_port(port_address);
   if (port == nullptr || v < 0 || h < 0) {
@@ -253,6 +262,15 @@ GrafPort *PortState::find_port_mutable(uint32_t port_address) {
   for (GrafPort &port : ports_) {
     if (port.address == port_address) {
       return &port;
+    }
+  }
+  return nullptr;
+}
+
+Region *PortState::find_region_mutable(uint32_t region_address) {
+  for (Region &region : regions_) {
+    if (region.allocated && region.address == region_address) {
+      return &region;
     }
   }
   return nullptr;

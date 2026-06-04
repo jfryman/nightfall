@@ -186,3 +186,68 @@ Rules:
   `MoveTo` (`A893`), and `Move` (`A894`).
 - **Implemented from this source:** Phase 4.3 QuickDraw line trap-word constants
   for the fixture and internal dispatcher tests.
+
+## QuickDraw Region Operations
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 3, "QuickDraw Drawing Reference", "Creating and Managing Regions",
+  pages 3-83 to 3-94, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-131.html`
+- **Consulted for:** Region allocation and disposal, rectangular region
+  construction, moving regions, copying regions, set operations, point
+  containment, equality, and empty-region behavior.
+- **Implemented from this source:** Phase 4.4 models regions as bounded pixel
+  sets so the implemented traps can update region structure deterministically.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 3, "QuickDraw Drawing Reference", `NewRgn`, page 3-83, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-132.html`
+- **Consulted for:** `NewRgn` creates the only new region handle, initializes it
+  to the empty region `(0,0,0,0)`, and other routines alter existing regions.
+- **Implemented from this source:** Phase 4.4 `NewRgn` allocates a modeled
+  region handle initialized to an empty region.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 3, "QuickDraw Drawing Reference", `SetRectRgn` and `RectRgn`, pages
+  3-87 to 3-88, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-138.html` and
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-139.html`
+- **Consulted for:** Rectangular regions replace prior region structure, and an
+  empty rectangle creates the empty region `(0,0,0,0)`.
+- **Implemented from this source:** Phase 4.4 `SetRectRgn` and `RectRgn` replace
+  modeled region structure with a rectangular pixel set or an empty region.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 3, "QuickDraw Drawing Reference", `SectRgn`, `UnionRgn`, `DiffRgn`,
+  `PtInRgn`, `EqualRgn`, and `EmptyRgn`, pages 3-90 to 3-94, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-142.html`,
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-143.html`,
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-144.html`,
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-146.html`,
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-148.html`, and
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-149.html`
+- **Consulted for:** Region intersection, union, difference, point containment,
+  equality, and empty-region semantics.
+- **Implemented from this source:** Phase 4.4 region operations update and query
+  the modeled pixel-set representation.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 2, "Basic QuickDraw Reference", `GetClip` and `SetClip`, pages 2-47
+  to 2-48, mirrored at:
+  `https://leopard-adc.pepas.com/documentation/mac/QuickDraw/QuickDraw-44.html`
+- **Consulted for:** `SetClip` copies the specified region into the current
+  port's clipping region without changing the source handle; `GetClip` copies
+  the current port clipping region into the supplied region handle.
+- **Implemented from this source:** Phase 4.4 `SetClip` and `GetClip` copy
+  modeled region structures between region handles and the current port.
+
+- **Source:** Apple Computer, *Inside Macintosh X-Ref*, "System Traps", pages
+  63-77, preserved at:
+  `https://vintageapple.org/macprogramming/pdf/Inside_Macintosh_X-Ref_1988.pdf`
+- **Consulted for:** Trap words for `SetClip` (`A879`), `GetClip` (`A87A`),
+  `NewRgn` (`A8D8`), `DisposeRgn` (`A8D9`), `CopyRgn` (`A8DC`),
+  `SetRectRgn` (`A8DE`), `RectRgn` (`A8DF`), `OffsetRgn` (`A8E0`),
+  `SectRgn` (`A8E4`), `UnionRgn` (`A8E5`), `DiffRgn` (`A8E6`),
+  `PtInRgn` (`A8E8`), `EmptyRgn` (`A8E2`), and `EqualRgn` (`A8E3`).
+- **Implemented from this source:** Phase 4.4 QuickDraw region and clipping
+  trap-word constants for fixtures and internal dispatcher tests.
