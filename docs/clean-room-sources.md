@@ -104,3 +104,48 @@ Rules:
   `SetPortBits` (`A875`), and `ClosePort` (`A87D`).
 - **Implemented from this source:** Phase 4.1 QuickDraw trap-word constants for
   the fixture and internal dispatcher tests.
+
+## QuickDraw Rectangle Drawing
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 3, "QuickDraw Drawing Reference", "Drawing Rectangles", pages 3-26
+  to 3-30, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-96.html`
+- **Consulted for:** `FrameRect` outlines a rectangle with the current pen;
+  `PaintRect` fills a rectangle with the pen pattern and mode; `FillRect` fills
+  with a caller-supplied pattern using `patCopy`; `EraseRect` fills with the
+  current port background pattern; `InvertRect` reverses pixels in the rectangle.
+- **Implemented from this source:** Phase 4.2 rectangle operations update the
+  modeled current port's software pixels according to those operation roles.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 3, "QuickDraw Drawing", "The Eight Basic QuickDraw Colors", page
+  3-12, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-59.html`
+- **Consulted for:** Basic QuickDraw uses `fgColor` and `bkColor` fields for
+  foreground and background colors, defaults to black foreground and white
+  background, and `ForeColor` / `BackColor` update those fields using the eight
+  predefined basic colors.
+- **Implemented from this source:** Phase 4.2 `ForeColor` and `BackColor`
+  update the modeled current port foreground and background colors.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 4, "Color QuickDraw Reference", "Drawing With Color QuickDraw Colors",
+  pages 4-61 to 4-63, mirrored at:
+  `https://leopard-adc.pepas.com/documentation/mac/QuickDraw/QuickDraw-220.html`
+- **Consulted for:** `RGBForeColor` sets the foreground color and
+  `RGBBackColor` sets the background color; both operate for basic graphics
+  ports in System 7.
+- **Implemented from this source:** Phase 4.2 `RGBForeColor` and
+  `RGBBackColor` store the requested RGB values and modeled direct 32-bit pixel
+  colors in the current port.
+
+- **Source:** Apple Computer, *Inside Macintosh X-Ref*, "System Traps", pages
+  63-76, preserved at:
+  `https://vintageapple.org/macprogramming/pdf/Inside_Macintosh_X-Ref_1988.pdf`
+- **Consulted for:** Trap words for `BackColor` (`A863`), `ForeColor` (`A862`),
+  `FrameRect` (`A8A1`), `PaintRect` (`A8A2`), `EraseRect` (`A8A3`),
+  `InvertRect` (`A8A4`), `FillRect` (`A8A5`), `RGBForeColor` (`AA14`), and
+  `RGBBackColor` (`AA15`).
+- **Implemented from this source:** Phase 4.2 QuickDraw rectangle and color
+  trap-word constants for the fixture and internal dispatcher tests.
