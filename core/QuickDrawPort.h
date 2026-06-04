@@ -22,6 +22,10 @@ constexpr uint16_t kTrapPaintRect = 0xA8A2u;
 constexpr uint16_t kTrapEraseRect = 0xA8A3u;
 constexpr uint16_t kTrapInvertRect = 0xA8A4u;
 constexpr uint16_t kTrapFillRect = 0xA8A5u;
+constexpr uint16_t kTrapLineTo = 0xA891u;
+constexpr uint16_t kTrapLine = 0xA892u;
+constexpr uint16_t kTrapMoveTo = 0xA893u;
+constexpr uint16_t kTrapMove = 0xA894u;
 constexpr uint16_t kTrapRGBForeColor = 0xAA14u;
 constexpr uint16_t kTrapRGBBackColor = 0xAA15u;
 
@@ -140,6 +144,10 @@ class PortState {
   nf_status erase_rect(const Rect &rect);
   nf_status invert_rect(const Rect &rect);
   nf_status fill_rect(const Rect &rect, const Pattern &pattern);
+  nf_status move_to(int16_t h, int16_t v);
+  nf_status move(int16_t dh, int16_t dv);
+  nf_status line_to(int16_t h, int16_t v);
+  nf_status line(int16_t dh, int16_t dv);
   nf_status dispatch(uint16_t trap_word, uint32_t argument_address);
 
   const QuickDrawGlobals &globals() const;

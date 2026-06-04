@@ -149,3 +149,40 @@ Rules:
   `RGBBackColor` (`AA15`).
 - **Implemented from this source:** Phase 4.2 QuickDraw rectangle and color
   trap-word constants for the fixture and internal dispatcher tests.
+
+## QuickDraw Line Drawing
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 3, "QuickDraw Drawing", "Drawing Lines", page 3-17, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-60.html`
+- **Consulted for:** `MoveTo` and `Move` place the graphics pen in local
+  coordinates; `LineTo` and `Line` draw from the current pen location to a new
+  point; line drawing updates the pen location.
+- **Implemented from this source:** Phase 4.3 line operations update the modeled
+  current port's pen location and draw into the modeled software pixels.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 3, "QuickDraw Drawing", "The Graphics Pen", page 3-4, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-59.html`
+- **Consulted for:** The graphics pen location is stored in the current graphics
+  port, the pen draws below and to the right of its defining point, and `MoveTo`
+  / `Move` change the pen location without drawing.
+- **Implemented from this source:** Phase 4.3 tests assert pen location state
+  before and after move and line operations.
+
+- **Source:** J. E. Bresenham, "Algorithm for Computer Control of a Digital
+  Plotter", *IBM Systems Journal*, Vol. 4, No. 1, 1965.
+- **Consulted for:** Deterministic integer rasterization of a line segment on a
+  software pixel grid.
+- **Implemented from this source:** Phase 4.3 uses an integer line walk to mark
+  modeled pixels between the old and new pen locations. This is a deterministic
+  software model for tests, not an assertion that classic QuickDraw's internal
+  rasterizer used this exact implementation.
+
+- **Source:** Apple Computer, *Inside Macintosh X-Ref*, "System Traps", pages
+  63-76, preserved at:
+  `https://vintageapple.org/macprogramming/pdf/Inside_Macintosh_X-Ref_1988.pdf`
+- **Consulted for:** Trap words for `LineTo` (`A891`), `Line` (`A892`),
+  `MoveTo` (`A893`), and `Move` (`A894`).
+- **Implemented from this source:** Phase 4.3 QuickDraw line trap-word constants
+  for the fixture and internal dispatcher tests.
