@@ -1,18 +1,21 @@
 # Nightfall — Current Phase
 
-**Current phase:** 4.4
+**Current phase:** 4.5
 **Status:** In progress
 **Started:** 2026-06-04
-**Timebox:** 12 cycles / 16 active hours
-**Cycle count:** 0 / 12
-**Active hours:** 0 / 16
-**Next expected deliverable:** docs/phase-4.4-validation.md
+**Timebox:** 18 cycles / 24 active hours
+**Cycle count:** 0 / 18
+**Active hours:** 0 / 24
+**Next expected deliverable:** docs/phase-4.5-validation.md
 **Agent(s) assigned:** codex-gpt-5
 **Last blocker:** docs/blockers/resolved/phase-4-missing-state-artifacts.md
 **Run status:** in progress
 
 ## Recent completions
 
+- Phase 4.4 completed 2026-06-04 by PR pending: QuickDraw region and clipping
+  traps implemented with co-located tests, fixture, citations, validation log,
+  and region-structure assertions.
 - Phase 4.3 completed 2026-06-04 by PR #11: QuickDraw line and pen-location
   traps implemented with co-located tests, fixture, citations, validation log,
   and scanline state assertions.
@@ -26,30 +29,20 @@
 
 ## Current objective
 
-Execute Phase 4.4: QuickDraw region operations.
+Execute Phase 4.5: QuickDraw bit and pixel map transfer operations.
 
 Required traps:
 
-- `NewRgn`
-- `DisposeRgn`
-- `SetRectRgn`
-- `RectRgn`
-- `OffsetRgn`
-- `CopyRgn`
-- `UnionRgn`
-- `SectRgn`
-- `DiffRgn`
-- `EmptyRgn`
-- `EqualRgn`
-- `PtInRgn`
-- `SetClip`
-- `GetClip`
+- `CopyBits`
+- `CopyMask`
 
 Required artifacts:
 
 - Co-located implementation, test, fixture, and citation files.
 - Public-source citations recorded before implementation in
   `docs/clean-room-sources.md`.
-- Region-structure state assertions.
-- Validation log at `docs/phase-4.4-validation.md`.
+- `PixMap` / `BitMap` modeling needed for the transfer subset.
+- Multiple source/destination/mode combinations.
+- Memory and pixel state assertions.
+- Validation log at `docs/phase-4.5-validation.md`.
 - Local gate suite and required GitHub check green before merge.
