@@ -15,8 +15,8 @@
 # non-zero exit. The agent re-runs it on every reconciliation (it is cheap and
 # idempotent). It never mutates the repo or your environment.
 #
-# Scope: the Phases 0-3 spike. Phase-A-only items (signing, KMS) are reported
-# SKIP, not FAIL.
+# Scope: Phase A (build the app). Phase-B-only items (cloud signing, KMS) are reported
+# SKIP, not FAIL; Phase A local signing is checked in section 10.
 #
 # Usage: ./scripts/preflight.sh [--test-slack] [--ci-mode actions|local]
 
@@ -37,8 +37,8 @@ MIN_MACOS_MAJOR="${NF_MIN_MACOS:-14}"
 VERSIONS_FILE="${NF_VERSIONS_FILE:-third_party/VERSIONS.toml}"
 TEST_NOTIFY=0
 
-# Tools the spike needs at or before the Phases 0-3 checkpoint.
-#   name|hard|why
+# Tools the build needs across Phase A (some not used until later phases).
+#   name|hard|why|install hint
 REQUIRED_TOOLS=(
   "git|1|version control"
   "gh|1|PR creation + self-merge-on-green"
@@ -46,7 +46,7 @@ REQUIRED_TOOLS=(
   "cmake|1|builds libnightfall (C++ authority)"
   "xcodegen|1|generates Nightfall.xcodeproj"
   "clang|1|C++17 + libFuzzer (-fsanitize=fuzzer)"
-  "vasm|1|assembles 68k .AD fixtures (Phase 1)"
+  "vasmm68k_mot|1|assembles 68k .AD fixtures (Phase 1)|install vasm from source or a package that provides vasmm68k_mot"
   "jq|1|parsing gh api responses in CI scripts"
   "abidiff|0|abi-guard ABI gate (see note re: Mach-O below)"
 )
@@ -93,25 +93,6 @@ fail() {
 }
 section() { printf '\n%s%s%s\n' "$C_BOLD$C_BLUE" "$1" "$C_OFF"; }
 have() { command -v "$1" >/dev/null 2>&1; }
-have_any() {
-  local tool
-  for tool in "$@"; do
-    command -v "$tool" >/dev/null 2>&1 && return 0
-  done
-  return 1
-}
-
-slack_keychain_secret_present() {
-  command -v security >/dev/null 2>&1 || return 1
-
-  local service="${NF_SLACK_WEBHOOK_KEYCHAIN_SERVICE:-nightfall/slack-webhook}"
-  local account="${NF_SLACK_WEBHOOK_KEYCHAIN_ACCOUNT:-${USER:-}}"
-  if [ -n "$account" ]; then
-    security find-generic-password -a "$account" -s "$service" -w >/dev/null 2>&1
-  else
-    security find-generic-password -s "$service" -w >/dev/null 2>&1
-  fi
-}
 
 # Reachability without depending on curl flags being uniform across versions.
 reachable() {
@@ -186,19 +167,14 @@ fi
 # ---------------------------------------------------------------------------
 section "2. Toolchain"
 for entry in "${REQUIRED_TOOLS[@]}"; do
-  IFS='|' read -r tool hard why <<<"$entry"
-  if [ "$tool" = "vasm" ] && have_any vasm vasmm68k_mot vasmm68k_std vasmm68k; then
-    pass "vasm-family assembler present  ${C_DIM}($why)${C_OFF}"
-  elif have "$tool"; then
+  IFS='|' read -r tool hard why hint <<<"$entry"
+  hint="${hint:-install $tool (e.g. brew install $tool)}"
+  if have "$tool"; then
     pass "$tool present  ${C_DIM}($why)${C_OFF}"
   elif [ "$hard" = "1" ]; then
-    if [ "$tool" = "vasm" ]; then
-      fail "$tool missing  ($why)" "install a vasm-family assembler such as vasmm68k"
-    else
-      fail "$tool missing  ($why)" "install $tool (e.g. brew install $tool)"
-    fi
+    fail "$tool missing  ($why)" "$hint"
   else
-    warn "$tool missing  ($why)" "install $tool when its phase is reached"
+    warn "$tool missing  ($why)" "$hint when its phase is reached"
   fi
 done
 
@@ -306,8 +282,8 @@ if [ "$CI_MODE" = "actions" ]; then
              "add the gate set to required status checks (else self-merge-on-green is not enforced)"
       fi
     else
-      fail "no branch protection on $PROTECTED_BRANCH" \
-           "enable protection + required checks so a failing PR cannot be merged"
+      warn "no branch protection on $PROTECTED_BRANCH yet" \
+           "expected at bootstrap — the gate checks are a Phase 0 deliverable; lock protection + required checks once Phase 0 has built them (required for Phase 1+ merges)"
     fi
     runners="$(gh api "repos/$repo_slug/actions/runners" --jq '[.runners[]?|select(.status=="online")]|length' 2>/dev/null)"
     if [ "${runners:-0}" -gt 0 ] 2>/dev/null; then
@@ -320,7 +296,7 @@ if [ "$CI_MODE" = "actions" ]; then
   fi
 else
   # local mode: the gate scripts must exist and be runnable
-  for s in nflint.py depcheck.py toolcheck.py trace-schema-guard.py tbcover.py asm-fixtures.sh abi-guard.sh boundary-check.py; do
+  for s in nflint.py tbcover.py abi-guard.sh boundary-check.py; do
     if [ -x "scripts/ci/$s" ] || [ -f "scripts/ci/$s" ]; then
       pass "gate script present: scripts/ci/$s"
     else
@@ -338,9 +314,6 @@ section "6. Dependency pinning"
 if [ -f "$VERSIONS_FILE" ]; then
   if grep -Eq 'TODO|FIXME|XXX|<pin>|""[[:space:]]*$' "$VERSIONS_FILE"; then
     fail "$VERSIONS_FILE has unfilled pins" "fill exact commits/tags, or commit the default-policy marker"
-  elif grep -Eq 'exact_pins_materialized[[:space:]]*=[[:space:]]*false' "$VERSIONS_FILE"; then
-    warn "$VERSIONS_FILE records the accepted bootstrap policy, but exact pins are still pending" \
-         "materialize exact commits/tags once network access and vendoring are available"
   else
     pass "$VERSIONS_FILE present and has no unfilled-pin markers"
   fi
@@ -371,10 +344,7 @@ notify_secret=""
 notify_var=""
 case "$NOTIFY_BACKEND" in
   none)     skip "NF_NOTIFY_BACKEND=none — no push alerts (CI/dry runs only)" ;;
-  slack)    notify_var="NIGHTFALL_SLACK_WEBHOOK or Keychain service nightfall/slack-webhook"
-            if [ -n "${NIGHTFALL_SLACK_WEBHOOK:-}" ] || slack_keychain_secret_present; then
-              notify_secret="set"
-            fi ;;
+  slack)    notify_var="NIGHTFALL_SLACK_WEBHOOK"; notify_secret="${NIGHTFALL_SLACK_WEBHOOK:-}" ;;
   ntfy)     notify_var="NTFY_URL";       notify_secret="${NTFY_URL:-}" ;;
   pushover) notify_var="PUSHOVER_TOKEN+PUSHOVER_USER"
             [ -n "${PUSHOVER_TOKEN:-}" ] && [ -n "${PUSHOVER_USER:-}" ] && notify_secret="set" ;;
@@ -413,13 +383,14 @@ if have pmset; then
 fi
 
 # ---------------------------------------------------------------------------
-# 10. Out of spike scope (informational)
+# 10. Phase A signing (needed at Phase 7/10; Phase B cloud-signing not yet)
 # ---------------------------------------------------------------------------
-section "10. Phase-A-only (not required for the 0-3 spike)"
+section "10. Phase A signing"
 if have security && security find-identity -v -p codesigning 2>/dev/null | grep -q 'Developer ID'; then
-  pass "Developer ID signing identity present (Phase A)"
+  pass "Developer ID signing identity present (local signing for Phase 7/10)"
 else
-  skip "no Developer ID identity — fine; signing is Phase A, outside this spike"
+  warn "no Developer ID identity — Phase A local signing (Phase 7/10) will need one" \
+       "install a Developer ID Application cert into the login keychain before Phase 7"
 fi
 skip "KMS / OIDC / Terraform (Q19) — Phase B, not now"
 

@@ -29,9 +29,21 @@ add_executable(nightfall_core_tests
 
 target_link_libraries(nightfall_core_tests PRIVATE nightfall_core)
 
+if(NOT DEFINED NIGHTFALL_DOCTEST_INCLUDE_DIR)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/doctest/doctest.h")
+    set(NIGHTFALL_DOCTEST_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/doctest")
+  elseif(EXISTS "/opt/homebrew/include/doctest/doctest.h")
+    set(NIGHTFALL_DOCTEST_INCLUDE_DIR "/opt/homebrew/include/doctest")
+  elseif(EXISTS "/usr/local/include/doctest/doctest.h")
+    set(NIGHTFALL_DOCTEST_INCLUDE_DIR "/usr/local/include/doctest")
+  else()
+    message(FATAL_ERROR "doctest.h not found; install doctest or vendor third_party/doctest/doctest.h")
+  endif()
+endif()
+
 target_include_directories(nightfall_core_tests
   PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/doctest
+    ${NIGHTFALL_DOCTEST_INCLUDE_DIR}
 )
 
 add_test(NAME nightfall_core_tests COMMAND nightfall_core_tests)

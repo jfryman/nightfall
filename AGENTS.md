@@ -1,6 +1,6 @@
 # AGENTS.md — Nightfall
 
-You are the worker agent executing the **Nightfall** spike. Nightfall is an After
+You are the worker agent executing the **Nightfall** build. Nightfall is an After
 Dark–compatible screensaver for modern macOS that runs original 68k modules. The
 real goal is proving a repeatable agentic-development pattern: *the screensaver is
 the excuse, the pattern is the product.* The pattern only works if you honor the
@@ -84,7 +84,7 @@ supervisor's job). You never read or embed the notify secret; the helper reads i
 from the environment. Severity controls how loudly it lands:
 
 - `urgent` — you opened a blocker and are halting; this needs them.
-- `high` — phase milestone reached, or spike complete.
+- `high` — phase milestone reached, or the run is complete.
 - `info` / `progress` — quiet; rarely worth a push from you.
 
 Always pair an `urgent` notify with the durable blocker doc — the notify is a
@@ -94,13 +94,13 @@ courtesy buzz, the doc is the contract.
   `docs/blockers/TEMPLATE.md`, commit and push it, send one `urgent` notify, then
   halt. Resume **only** when the maintainer appends an `## Adjudication …
   **Resume:** yes` block to that doc — never on anything else.
-- **On reaching the spike boundary:** set a line in `docs/current-phase.md`
-  exactly: `**Spike status:** complete`. That is the supervisor's terminal
-  signal.
+- **On reaching the run boundary** (Phase A complete): set a line in
+  `docs/current-phase.md` exactly: `**Run status:** complete`. That is the
+  supervisor's terminal signal.
 
 ## Halt conditions (stop on exactly one; otherwise keep going)
 
-1. Spike boundary reached (see scope below).
+1. Run boundary reached — Phase A complete (see scope below).
 2. STOP gate → blocker doc + halt.
 3. A subphase exceeds 2× its cycle/active-hour budget → blocker doc.
 4. Plan contradiction / uncovered situation → blocker doc. Do not invent.
@@ -112,10 +112,18 @@ You do not stop because work is hard or slow.
 
 ## Scope of THIS run
 
-**Phases 0 → the first-agent checkpoint (Phases 0–3), terminal.** Reach it, set
-`**Spike status:** complete`, stop — regardless of remaining budget. Do not begin
-Phase 4. Phase 0.5 is **non-blocking**: keep "Nightfall" as a placeholder, proceed
-to Phase 1; do not attempt a trademark search (maintainer/legal task).
+**Build the app: execute Phase A to completion (Phases 4 → 10).** Phases 0–3 are
+done — the enforcement gates, trace pipeline, C ABI, and clean-room scaffolding
+exist; reconcile against them, do not rebuild them. Advance sequentially through
+Phase 4 (QuickDraw traps, atomic subphases 4.1–4.6), Phase 5, Phase 6 (native
+Metal renderer — use the golden-frame split: exact hash for the core framebuffer,
+tolerance/perceptual diff for Metal output; no Vulkan/MoltenVK/SPIR-V), Phase 7
+(`.app` wiring — first visible milestone), Phase 8 (validate the remaining real
+modules — maintainer-manual; blocker for the artifact, never load real modules in
+CI), through Phase 10 (ship Phase A). When Phase 10 is genuinely complete, set
+exactly `**Run status:** complete` in `docs/current-phase.md` — the supervisor's
+terminal signal. Do not start Phase B (signing/notarization/distribution, the
+name/trademark gate) or Phase C (PowerPC) without explicit direction.
 
 ## Locked decisions (in-context so you don't re-derive them)
 
@@ -124,13 +132,14 @@ to Phase 1; do not attempt a trademark search (maintainer/legal task).
 - Build: CMake is the authority for `libnightfall`; **XcodeGen** generates
   `Nightfall.xcodeproj`. Do not hand-author `pbxproj`.
 - C++ tests: **doctest**. Fuzzing: **libFuzzer** (`-fsanitize=fuzzer`).
-- Sanitizers: ASan + UBSan **required**; TSan best-effort (not a required check
-  this spike — core is single-threaded-per-context through Phase 3).
+- Sanitizers: ASan + UBSan **required**. TSan now applies — Phase 3 core was
+  single-threaded-per-context, but renderer/audio threading lands in Phase 6+;
+  run TSan there and promote it to a required check once threaded code exists.
 - `VERSIONS.toml`: default pin policy (latest stable as of bootstrap, hash
   recorded, `DEP-UPDATE:` tag to change).
 - Golden frames: exact hash for the deterministic core framebuffer; tolerance /
-  perceptual diff for non-deterministic Metal output (Phase 6 — out of this
-  spike's scope, but don't exact-hash Metal output if you get there).
+  perceptual diff for non-deterministic Metal output (Phase 6, now in scope) —
+  do **not** exact-hash Metal output.
 - **Phase 0 exit also requires gate-meta-tests**: every gate ships committed
   known-bad/known-good fixtures, run in CI, asserting it fails for the right
   reason and passes otherwise. The four-PR demo alone is not Phase 0 done.

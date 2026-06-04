@@ -1,57 +1,47 @@
-# Nightfall dependency and toolchain source-of-truth.
+# Nightfall dependency/toolchain policy marker.
 #
-# Bootstrap status:
-# The accepted policy is "latest stable as of bootstrap date, with exact hashes
-# recorded here once provisioning/network access is available." This file exists
-# so the repo has a durable, reviewable manifest shape before vendoring begins.
+# The launch gate allows either materialized exact pins or this explicit default
+# policy marker. Per the 2026-05-28 decision, default selection is latest stable
+# as of bootstrap, with exact commits/tags recorded when dependencies are first
+# vendored and `DEP-UPDATE:` required for later pin changes.
 
 [policy]
 bootstrap_date = "2026-05-28"
-selection_rule = "latest stable release or tag as of bootstrap date"
-change_control = "DEP-UPDATE commit tag required for changes"
+selection_rule = "latest stable as of bootstrap; record exact hashes when vendored"
+change_control = "DEP-UPDATE:"
 bootstrap_policy_accepted = true
 exact_pins_materialized = false
 
+[toolchain]
+xcode = "Xcode 26.3 (Build version 17C529)"
+macos = "26.5"
+xcodegen = "2.45.4"
+cmake = "4.3.0"
+
 [dependencies.musashi]
+repo = "https://github.com/kstenerud/Musashi"
 kind = "git"
-role = "68k CPU emulation"
-selection_status = "policy-approved pending exact commit"
 
 [dependencies.nlohmann_json]
+repo = "https://github.com/nlohmann/json"
 kind = "release"
-role = "JSON support"
-selection_status = "policy-approved pending exact tag"
 
 [dependencies.glsl_crt]
+repo = "https://github.com/wessles/GLSL-CRT"
 kind = "git"
-role = "shader CRT support"
-selection_status = "policy-approved pending exact commit"
 
 [tools.vasm]
-kind = "tool"
-role = "68k fixture assembler"
-selection_status = "installed for Phase 1"
-version = "vasm 1.8e"
-backend = "vasm M68k/CPU32/ColdFire cpu backend 2.3c"
-syntax_module = "vasm motorola syntax module 3.12"
-installed_binary = "vasmm68k_mot"
+command = "vasmm68k_mot"
+version = "vasm 1.8e; M68k/CPU32/ColdFire cpu backend 2.3c"
 
 [tools.libabigail]
-kind = "tool"
-role = "ABI diff tooling"
-selection_status = "policy-approved pending exact version and Mach-O validation"
+decision = "open: Mach-O support unresolved; use symbol/header snapshot fallback unless adjudicated"
 
 [toolchain.doctest]
-kind = "header-only test framework"
 decision = "selected"
-version = "v2.5.2"
-tag_commit = "6804767ee637789db8a5cb281381cae98dc36906"
-published_at = "2026-04-14T10:41:26Z"
-source = "https://github.com/doctest/doctest"
-vendored_header = "third_party/doctest/doctest.h"
+version = "2.5.2"
 
 [toolchain.libfuzzer]
-kind = "fuzz engine"
 decision = "selected"
 
 [toolchain.sanitizers]
@@ -59,10 +49,4 @@ required = ["asan", "ubsan"]
 best_effort = ["tsan"]
 
 [toolchain.xcodegen]
-kind = "project generator"
 decision = "selected"
-
-[build_host]
-target = "smugglebook"
-os = "macOS 26"
-arch = "arm64"

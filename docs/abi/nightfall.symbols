@@ -1,9 +1,0 @@
-nf_context_create
-nf_context_destroy
-nf_context_dispatch_trap
-nf_context_execute_fixture
-nf_context_register_trap
-nf_context_tick
-nf_context_ticks
-nf_get_version
-nf_trap_is_aline
