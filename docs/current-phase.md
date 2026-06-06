@@ -1,18 +1,22 @@
 # Nightfall — Current Phase
 
-**Current phase:** 4.6
+**Current phase:** 4 checkpoint
 **Status:** In progress
 **Started:** 2026-06-04
-**Timebox:** 18 cycles / 24 active hours
-**Cycle count:** 0 / 18
-**Active hours:** 0 / 24
-**Next expected deliverable:** docs/phase-4.6-validation.md
+**Timebox:** 6 cycles / 8 active hours
+**Cycle count:** 0 / 6
+**Active hours:** 0 / 8
+**Next expected deliverable:** docs/phase-4-validation.md
 **Agent(s) assigned:** codex-gpt-5
 **Last blocker:** docs/blockers/resolved/phase-4.6-missing-pict-prereqs.md
 **Run status:** in progress
 
 ## Recent completions
 
+- Phase 4.6 completed 2026-06-05 by PR #15: `DrawPicture` PICT 2 playback
+  implemented for the `tools/pict-gen` opcode slice with co-located tests,
+  fixture, citations, validation log, parser error assertions, pixel state
+  assertions, and `fuzz-pict` coverage.
 - Phase 4.6 PICT prerequisites backfilled 2026-06-04 after adjudication of
   `docs/blockers/resolved/phase-4.6-missing-pict-prereqs.md`: `tools/pict-gen/`
   now emits the initial PICT 2 fixture slice, `fuzz-pict` is wired through
@@ -37,19 +41,20 @@
 
 ## Current objective
 
-Execute Phase 4.6: QuickDraw PICT interpreter operations.
+Execute the Phase 4 checkpoint: Q7 color-depth validation after the QuickDraw
+subset.
 
-Required traps:
+Required validation:
 
-- `DrawPicture`
+- Validate the Phase 4 QuickDraw subset against the seven benchmark modules or
+  maintainer-provided sanitized artifacts.
+- Apply the Q7 decision table: proceed, insert 8-bit indexed fallback work, or
+  STOP with a blocker doc.
 
 Required artifacts:
 
-- Co-located implementation, test, fixture, and citation files.
-- Public-source citations recorded before implementation in
-  `docs/clean-room-sources.md`.
-- PICT 2 opcode coverage matching `tools/pict-gen` coverage.
-- `fuzz-pict` mandatory for this subphase.
-- Picture decoding, pixel state, and parser error assertions.
-- Validation log at `docs/phase-4.6-validation.md`.
+- Validation log at `docs/phase-4-validation.md`.
+- Decision-table result recorded in the validation log.
+- Blocker doc if required maintainer-manual artifacts are absent or Q7 says
+  STOP.
 - Local gate suite and required GitHub check green before merge.

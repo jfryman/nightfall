@@ -2,6 +2,8 @@
 
 namespace nightfall::quickdraw {
 
+#define NF_TOOLBOX_TRAP(trap_word) record_trace(trap_word)
+
 namespace {
 
 class Reader {
@@ -55,22 +57,40 @@ void reset_coverage(PictOpcodeCoverage *coverage) {
   }
 }
 
-bool skip_rgb(Reader *reader) {
-  return reader->skip(6u);
+bool read_rgb(Reader *reader, RGBColor *out_color) {
+  return reader->read_u16(&out_color->red) && reader->read_u16(&out_color->green) &&
+         reader->read_u16(&out_color->blue);
 }
 
-bool skip_line(Reader *reader) {
-  return reader->skip(8u);
+int16_t map_coordinate(int16_t value, int16_t source_min, int16_t source_max, int16_t destination_min,
+                       int16_t destination_max) {
+  const int source_span = source_max - source_min;
+  const int destination_span = destination_max - destination_min;
+  if (source_span == 0) {
+    return destination_min;
+  }
+  return static_cast<int16_t>(destination_min +
+                              (((static_cast<int>(value) - source_min) * destination_span) / source_span));
 }
 
-bool skip_rect(Reader *reader) {
-  return reader->skip(8u);
+Point map_point(Point point, const Rect &frame, const Rect &destination) {
+  return Point{
+      map_coordinate(point.v, frame.top, frame.bottom, destination.top, destination.bottom),
+      map_coordinate(point.h, frame.left, frame.right, destination.left, destination.right),
+  };
 }
 
-}  // namespace
+Rect map_rect(Rect rect, const Rect &frame, const Rect &destination) {
+  const Point top_left = map_point(Point{rect.top, rect.left}, frame, destination);
+  const Point bottom_right = map_point(Point{rect.bottom, rect.right}, frame, destination);
+  return Rect{top_left.v, top_left.h, bottom_right.v, bottom_right.h};
+}
 
-// Source: docs/clean-room-sources.md, "QuickDraw PICT Streams".
-nf_status validate_pict2(const uint8_t *bytes, size_t byte_count, PictOpcodeCoverage *out_coverage) {
+nf_status play_or_validate_pict2(PortState *state,
+                                 const uint8_t *bytes,
+                                 size_t byte_count,
+                                 const Rect *destination_rect,
+                                 PictOpcodeCoverage *out_coverage) {
   reset_coverage(out_coverage);
   if (bytes == nullptr || byte_count < 16u) {
     return NF_ERROR_INVALID_ARGUMENT;
@@ -87,6 +107,7 @@ nf_status validate_pict2(const uint8_t *bytes, size_t byte_count, PictOpcodeCove
     return NF_ERROR_INVALID_ARGUMENT;
   }
 
+  const Rect destination = destination_rect == nullptr ? frame : *destination_rect;
   PictOpcodeCoverage coverage{};
   coverage.frame = frame;
   coverage.saw_version = true;
@@ -108,54 +129,124 @@ nf_status validate_pict2(const uint8_t *bytes, size_t byte_count, PictOpcodeCove
       case kPictNop:
         coverage.saw_nop = true;
         break;
-      case kPictRGBForeColor:
+      case kPictRGBForeColor: {
         coverage.saw_rgb_fore_color = true;
-        if (!skip_rgb(&reader)) {
+        RGBColor color{};
+        if (!read_rgb(&reader, &color)) {
           return NF_ERROR_INVALID_ARGUMENT;
         }
+        if (state != nullptr) {
+          const nf_status status = state->rgb_fore_color(color);
+          if (status != NF_OK) {
+            return status;
+          }
+        }
         break;
-      case kPictRGBBackColor:
+      }
+      case kPictRGBBackColor: {
         coverage.saw_rgb_back_color = true;
-        if (!skip_rgb(&reader)) {
+        RGBColor color{};
+        if (!read_rgb(&reader, &color)) {
           return NF_ERROR_INVALID_ARGUMENT;
         }
+        if (state != nullptr) {
+          const nf_status status = state->rgb_back_color(color);
+          if (status != NF_OK) {
+            return status;
+          }
+        }
         break;
-      case kPictLine:
+      }
+      case kPictLine: {
         coverage.saw_line = true;
-        if (!skip_line(&reader)) {
+        Rect line{};
+        if (!reader.read_rect(&line)) {
           return NF_ERROR_INVALID_ARGUMENT;
         }
+        if (state != nullptr) {
+          const Point from = map_point(Point{line.top, line.left}, frame, destination);
+          const Point to = map_point(Point{line.bottom, line.right}, frame, destination);
+          nf_status status = state->move_to(from.h, from.v);
+          if (status != NF_OK) {
+            return status;
+          }
+          status = state->line_to(to.h, to.v);
+          if (status != NF_OK) {
+            return status;
+          }
+        }
         break;
-      case kPictFrameRect:
+      }
+      case kPictFrameRect: {
         coverage.saw_frame_rect = true;
-        if (!skip_rect(&reader)) {
+        Rect rect{};
+        if (!reader.read_rect(&rect)) {
           return NF_ERROR_INVALID_ARGUMENT;
         }
+        if (state != nullptr) {
+          const nf_status status = state->frame_rect(map_rect(rect, frame, destination));
+          if (status != NF_OK) {
+            return status;
+          }
+        }
         break;
-      case kPictPaintRect:
+      }
+      case kPictPaintRect: {
         coverage.saw_paint_rect = true;
-        if (!skip_rect(&reader)) {
+        Rect rect{};
+        if (!reader.read_rect(&rect)) {
           return NF_ERROR_INVALID_ARGUMENT;
         }
+        if (state != nullptr) {
+          const nf_status status = state->paint_rect(map_rect(rect, frame, destination));
+          if (status != NF_OK) {
+            return status;
+          }
+        }
         break;
-      case kPictEraseRect:
+      }
+      case kPictEraseRect: {
         coverage.saw_erase_rect = true;
-        if (!skip_rect(&reader)) {
+        Rect rect{};
+        if (!reader.read_rect(&rect)) {
           return NF_ERROR_INVALID_ARGUMENT;
         }
+        if (state != nullptr) {
+          const nf_status status = state->erase_rect(map_rect(rect, frame, destination));
+          if (status != NF_OK) {
+            return status;
+          }
+        }
         break;
-      case kPictInvertRect:
+      }
+      case kPictInvertRect: {
         coverage.saw_invert_rect = true;
-        if (!skip_rect(&reader)) {
+        Rect rect{};
+        if (!reader.read_rect(&rect)) {
           return NF_ERROR_INVALID_ARGUMENT;
         }
+        if (state != nullptr) {
+          const nf_status status = state->invert_rect(map_rect(rect, frame, destination));
+          if (status != NF_OK) {
+            return status;
+          }
+        }
         break;
-      case kPictFillRect:
+      }
+      case kPictFillRect: {
         coverage.saw_fill_rect = true;
-        if (!skip_rect(&reader)) {
+        Rect rect{};
+        if (!reader.read_rect(&rect)) {
           return NF_ERROR_INVALID_ARGUMENT;
         }
+        if (state != nullptr) {
+          const nf_status status = state->paint_rect(map_rect(rect, frame, destination));
+          if (status != NF_OK) {
+            return status;
+          }
+        }
         break;
+      }
       case kPictEndPic:
         coverage.saw_end_pic = true;
         if (!reader.at_end()) {
@@ -172,5 +263,23 @@ nf_status validate_pict2(const uint8_t *bytes, size_t byte_count, PictOpcodeCove
 
   return NF_ERROR_INCOMPLETE_PROGRAM;
 }
+
+}  // namespace
+
+// Source: docs/clean-room-sources.md, "QuickDraw PICT Streams".
+nf_status validate_pict2(const uint8_t *bytes, size_t byte_count, PictOpcodeCoverage *out_coverage) {
+  return play_or_validate_pict2(nullptr, bytes, byte_count, nullptr, out_coverage);
+}
+
+// Source: docs/clean-room-sources.md, "QuickDraw PICT Streams".
+nf_status PortState::draw_picture(const uint8_t *bytes,
+                                  size_t byte_count,
+                                  const Rect &destination_rect,
+                                  PictOpcodeCoverage *out_coverage) {
+  NF_TOOLBOX_TRAP(kTrapDrawPicture);
+  return play_or_validate_pict2(this, bytes, byte_count, &destination_rect, out_coverage);
+}
+
+#undef NF_TOOLBOX_TRAP
 
 }  // namespace nightfall::quickdraw
