@@ -13,7 +13,7 @@
 
 ## Recent completions
 
-- Phase 4.6 completed 2026-06-05 by PR pending: `DrawPicture` PICT 2 playback
+- Phase 4.6 completed 2026-06-05 by PR #15: `DrawPicture` PICT 2 playback
   implemented for the `tools/pict-gen` opcode slice with co-located tests,
   fixture, citations, validation log, parser error assertions, pixel state
   assertions, and `fuzz-pict` coverage.
