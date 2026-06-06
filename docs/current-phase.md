@@ -1,14 +1,14 @@
 # Nightfall — Current Phase
 
 **Current phase:** 4 checkpoint
-**Status:** In progress
+**Status:** Blocked
 **Started:** 2026-06-04
 **Timebox:** 6 cycles / 8 active hours
 **Cycle count:** 0 / 6
 **Active hours:** 0 / 8
 **Next expected deliverable:** docs/phase-4-validation.md
 **Agent(s) assigned:** codex-gpt-5
-**Last blocker:** docs/blockers/resolved/phase-4.6-missing-pict-prereqs.md
+**Last blocker:** docs/blockers/phase-4-checkpoint-missing-q7-artifacts.md
 **Run status:** in progress
 
 ## Recent completions
