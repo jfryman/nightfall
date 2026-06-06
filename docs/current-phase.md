@@ -1,18 +1,22 @@
 # Nightfall — Current Phase
 
-**Current phase:** 4 checkpoint
+**Current phase:** 5
 **Status:** In progress
-**Started:** 2026-06-04
-**Timebox:** 6 cycles / 8 active hours
-**Cycle count:** 0 / 6
-**Active hours:** 0 / 8
-**Next expected deliverable:** docs/phase-4-validation.md
+**Started:** 2026-06-06
+**Timebox:** 24 cycles / 32 active hours
+**Cycle count:** 0 / 24
+**Active hours:** 0 / 32
+**Next expected deliverable:** docs/phase-5-validation.md
 **Agent(s) assigned:** codex-gpt-5
-**Last blocker:** docs/blockers/resolved/phase-4.6-missing-pict-prereqs.md
+**Last blocker:** docs/blockers/resolved/phase-4-checkpoint-missing-q7-artifacts.md
 **Run status:** in progress
 
 ## Recent completions
 
+- Phase 4 checkpoint completed 2026-06-06 by PR #16 after adjudication of
+  `docs/blockers/resolved/phase-4-checkpoint-missing-q7-artifacts.md`: synthetic
+  fixture/PICT/fuzzer evidence accepted for this checkpoint; real-module Q7
+  benchmark evidence remains maintainer-manual and is not claimed here.
 - Phase 4.6 completed 2026-06-05 by PR #15: `DrawPicture` PICT 2 playback
   implemented for the `tools/pict-gen` opcode slice with co-located tests,
   fixture, citations, validation log, parser error assertions, pixel state
@@ -41,20 +45,36 @@
 
 ## Current objective
 
-Execute the Phase 4 checkpoint: Q7 color-depth validation after the QuickDraw
-subset.
+Execute Phase 5: Memory/Resource/Sound-stub/misc Toolbox.
 
-Required validation:
+Required traps and routines:
 
-- Validate the Phase 4 QuickDraw subset against the seven benchmark modules or
-  maintainer-provided sanitized artifacts.
-- Apply the Q7 decision table: proceed, insert 8-bit indexed fallback work, or
-  STOP with a blocker doc.
+- `NewHandle`
+- `DisposeHandle`
+- `GetHandleSize`
+- `SetHandleSize`
+- `HLock`
+- `HUnlock`
+- `HGetState`
+- `HSetState`
+- `NewPtr`
+- `DisposePtr`
+- `GetResource`
+- `ReleaseResource`
+- `GetResourceSizeOnDisk`
+- `DetachResource`
+- `TickCount`
+- `GetDateTime`
+- `Delay`
+- `LMGetTicks`
+- Silent Sound Manager stub
 
 Required artifacts:
 
-- Validation log at `docs/phase-4-validation.md`.
-- Decision-table result recorded in the validation log.
-- Blocker doc if required maintainer-manual artifacts are absent or Q7 says
-  STOP.
+- Co-located implementation, test, fixture, and citation files.
+- Public-source citations recorded before implementation in
+  `docs/clean-room-sources.md`.
+- Validation log at `docs/phase-5-validation.md`.
+- Flying Toasters end-to-end checkpoint evidence, or blocker if required
+  maintainer-manual artifacts are absent.
 - Local gate suite and required GitHub check green before merge.
