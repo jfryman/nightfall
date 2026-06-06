@@ -320,6 +320,15 @@ Rules:
   modeled PICT 2 record envelope before opcode coverage is considered.
 
 - **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
+  Chapter 7, "Pictures", `DrawPicture`, mirrored at:
+  `https://leopard-adc.pepas.com/documentation/mac/QuickDraw/QuickDraw-349.html`
+- **Consulted for:** `DrawPicture` draws a picture into the current graphics
+  port, using a destination rectangle to place the picture playback.
+- **Implemented from this source:** Phase 4.6 `DrawPicture` replays the covered
+  PICT 2 opcode slice into the modeled current graphics port, mapping picture
+  frame coordinates into the supplied destination rectangle.
+
+- **Source:** Apple Computer, *Inside Macintosh: Imaging With QuickDraw*,
   Appendix A, "Picture Opcodes", mirrored at:
   `https://dev.os9.ca/techpubs/mac/QuickDraw/QuickDraw-458.html`
 - **Consulted for:** The first opcode in a picture is the version opcode,
@@ -346,3 +355,10 @@ Rules:
 - **Implemented from this source:** Phase 4.6 prerequisite `tools/pict-gen/`
   coverage and `QuickDrawPicture` parser coverage for the initial opcode set
   that `DrawPicture` will consume.
+
+- **Source:** Apple Computer, *Inside Macintosh X-Ref*, "System Traps", pages
+  63-77, preserved at:
+  `https://vintageapple.org/macprogramming/pdf/Inside_Macintosh_X-Ref_1988.pdf`
+- **Consulted for:** Trap word for `DrawPicture` (`A8F6`).
+- **Implemented from this source:** Phase 4.6 `DrawPicture` trap-word constant
+  for the fixture and trace assertions.

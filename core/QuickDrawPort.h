@@ -44,6 +44,7 @@ constexpr uint16_t kTrapUnionRgn = 0xA8E5u;
 constexpr uint16_t kTrapDiffRgn = 0xA8E6u;
 constexpr uint16_t kTrapPtInRgn = 0xA8E8u;
 constexpr uint16_t kTrapCopyBits = 0xA8ECu;
+constexpr uint16_t kTrapDrawPicture = 0xA8F6u;
 
 constexpr uint32_t kNilAddress = 0u;
 constexpr uint32_t kDefaultScreenWidth = 640u;
@@ -160,6 +161,8 @@ struct QuickDrawGlobals {
   int32_t rand_seed;
 };
 
+struct PictOpcodeCoverage;
+
 class PortState {
  public:
   nf_status init_graf(uint32_t global_ptr);
@@ -207,6 +210,10 @@ class PortState {
                       const Rect &source_rect,
                       const Rect &mask_rect,
                       const Rect &destination_rect);
+  nf_status draw_picture(const uint8_t *bytes,
+                         size_t byte_count,
+                         const Rect &destination_rect,
+                         PictOpcodeCoverage *out_coverage);
   nf_status dispatch(uint16_t trap_word, uint32_t argument_address);
 
   const QuickDrawGlobals &globals() const;

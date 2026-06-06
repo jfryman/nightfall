@@ -2,5 +2,7 @@
 .DS_Store
 build/
 build-sanitize/
+build-fuzz/
+build-pict-gen/
 __pycache__/
 *.pyc

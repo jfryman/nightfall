@@ -93,5 +93,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   std::vector<uint8_t> structured = structured_picture(data, size);
   (void)nightfall::quickdraw::validate_pict2(structured.data(), structured.size(), &coverage);
+  nightfall::quickdraw::PortState state;
+  (void)state.init_graf(0x00001000u);
+  (void)state.open_port(0x00002000u);
+  (void)state.draw_picture(structured.data(), structured.size(), nightfall::quickdraw::Rect{0, 0, 64, 64},
+                           &coverage);
   return 0;
 }
