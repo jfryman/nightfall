@@ -42,4 +42,4 @@ blocker at
 `docs/blockers/resolved/phase-5-missing-flying-toasters-artifact.md`.
 The checkpoint remains blocked because the current repository lacks a
 real-module execution runner/API:
-`docs/blockers/phase-5-missing-real-module-runner.md`.
+`docs/blockers/resolved/phase-5-missing-real-module-runner.md`.

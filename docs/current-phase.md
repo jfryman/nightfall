@@ -1,14 +1,14 @@
 # Nightfall — Current Phase
 
 **Current phase:** 5
-**Status:** Blocked
+**Status:** In progress
 **Started:** 2026-06-06
 **Timebox:** 24 cycles / 32 active hours
 **Cycle count:** 0 / 24
 **Active hours:** 0 / 32
 **Next expected deliverable:** docs/phase-5-validation.md
 **Agent(s) assigned:** codex-gpt-5
-**Last blocker:** docs/blockers/phase-5-missing-real-module-runner.md
+**Last blocker:** docs/blockers/resolved/phase-5-missing-real-module-runner.md
 **Run status:** in progress
 
 ## Recent completions
@@ -84,4 +84,5 @@ Required artifacts:
 - 2026-06-06: Maintainer supplied the local Flying Toasters module and it was
   copied only into ignored `.nightfall/` scratch, but the current repository
   lacks a real-module execution runner/API for the required 10-minute checkpoint.
-  Open blocker: `docs/blockers/phase-5-missing-real-module-runner.md`.
+  Blocker adjudicated with `**Resume:** yes` for scoped backfill:
+  `docs/blockers/resolved/phase-5-missing-real-module-runner.md`.

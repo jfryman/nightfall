@@ -198,6 +198,22 @@ the no-real-modules-in-CI rule. **Consequences:** the run proceeds to Phase 5;
 real-module benchmark validation remains maintainer-manual evidence to supply or
 revisit before any later compatibility/release claim depends on it.
 
+### 2026-06-06 — Phase 5 scoped real-module runner backfill
+**Context:** Phase 5 requires a 10-minute Flying Toasters checkpoint, and the
+maintainer supplied a local module copy for manual validation. The current
+repository lacks the prior-phase runner/API artifacts the plan expected:
+resource/module loading, Musashi execution, `tbtrace` or equivalent, and
+`nf_module_*` / `nf_advance` C ABI functions. The blocker at
+`docs/blockers/resolved/phase-5-missing-real-module-runner.md` was adjudicated with
+`**Resume:** yes` for Option 2. **Decision:** authorize a scoped backfill of the
+missing real-module runner/API artifacts before completing Phase 5, treating this
+as reconciliation of absent prior-phase deliverables rather than a Phase 5 scope
+expansion. **Rationale:** the runner is necessary to evaluate the checkpoint the
+plan already requires, and silently skipping it would make the Phase 5 gate
+meaningless. **Consequences:** Phase 5 may temporarily backfill the minimal
+runtime/runner path needed to load the ignored local module, run the checkpoint,
+and commit only sanitized evidence.
+
 ---
 
 ### Open (not yet decided)

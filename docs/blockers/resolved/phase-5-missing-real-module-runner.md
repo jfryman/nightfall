@@ -68,8 +68,15 @@ rebuild them. If they do not exist, Option 2 is the clearest repair path.
 Resume only after the maintainer appends an adjudication block below with
 `**Resume:** yes`.
 
-## Adjudication 2026-06-06
+## Adjudication 2026-06-06 — Option 2
 
-Decision:
+Decision: Option 2. Authorize a scoped backfill of the missing real-module
+runner/API artifacts needed to run the Phase 5 checkpoint. This is
+reconciliation of absent prior-phase deliverables, not a Phase 5 scope change.
 
-**Resume:** no
+Rationale: The real-module runner is the thing Nightfall is building, but the
+plan had treated its initial runner/API pieces as completed prior-phase
+infrastructure. The current repository does not contain them, so a scoped
+backfill is required before Phase 5 can honestly run the checkpoint.
+
+**Resume:** yes
