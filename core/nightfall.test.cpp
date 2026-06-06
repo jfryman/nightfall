@@ -4,7 +4,12 @@
 
 #include "nightfall.h"
 
+#include <sys/types.h>
+#include <sys/xattr.h>
+#include <unistd.h>
+
 #include <cstring>
+#include <cstdio>
 #include <vector>
 
 namespace {
@@ -28,6 +33,77 @@ nf_status record_trap(nf_context *, uint16_t trap_word, void *user_data) {
   auto *seen_trap = static_cast<uint16_t *>(user_data);
   *seen_trap = trap_word;
   return NF_OK;
+}
+
+void put_u16(std::vector<uint8_t> *bytes, size_t offset, uint16_t value) {
+  (*bytes)[offset] = static_cast<uint8_t>((value >> 8u) & 0xFFu);
+  (*bytes)[offset + 1u] = static_cast<uint8_t>(value & 0xFFu);
+}
+
+void put_u24(std::vector<uint8_t> *bytes, size_t offset, uint32_t value) {
+  (*bytes)[offset] = static_cast<uint8_t>((value >> 16u) & 0xFFu);
+  (*bytes)[offset + 1u] = static_cast<uint8_t>((value >> 8u) & 0xFFu);
+  (*bytes)[offset + 2u] = static_cast<uint8_t>(value & 0xFFu);
+}
+
+void put_u32(std::vector<uint8_t> *bytes, size_t offset, uint32_t value) {
+  (*bytes)[offset] = static_cast<uint8_t>((value >> 24u) & 0xFFu);
+  (*bytes)[offset + 1u] = static_cast<uint8_t>((value >> 16u) & 0xFFu);
+  (*bytes)[offset + 2u] = static_cast<uint8_t>((value >> 8u) & 0xFFu);
+  (*bytes)[offset + 3u] = static_cast<uint8_t>(value & 0xFFu);
+}
+
+uint32_t type_code(char a, char b, char c, char d) {
+  return (static_cast<uint32_t>(static_cast<uint8_t>(a)) << 24u) |
+         (static_cast<uint32_t>(static_cast<uint8_t>(b)) << 16u) |
+         (static_cast<uint32_t>(static_cast<uint8_t>(c)) << 8u) |
+         static_cast<uint32_t>(static_cast<uint8_t>(d));
+}
+
+std::vector<uint8_t> make_adgm_resource_fork_fixture() {
+  std::vector<uint8_t> bytes(128u, 0u);
+  constexpr size_t data_offset = 0x10u;
+  constexpr size_t map_offset = 0x30u;
+  constexpr size_t type_list_offset = map_offset + 0x1Cu;
+  constexpr size_t name_list_offset = map_offset + 0x34u;
+  constexpr size_t reference_list_offset = type_list_offset + 10u;
+
+  put_u32(&bytes, 0u, data_offset);
+  put_u32(&bytes, 4u, map_offset);
+  put_u32(&bytes, 8u, 8u);
+  put_u32(&bytes, 12u, 0x40u);
+
+  put_u32(&bytes, data_offset, 4u);
+  bytes[data_offset + 4u] = 0xA9u;
+  bytes[data_offset + 5u] = 0x75u;
+  bytes[data_offset + 6u] = 0x4Eu;
+  bytes[data_offset + 7u] = 0x75u;
+
+  put_u32(&bytes, map_offset, data_offset);
+  put_u32(&bytes, map_offset + 4u, map_offset);
+  put_u32(&bytes, map_offset + 8u, 8u);
+  put_u32(&bytes, map_offset + 12u, 0x40u);
+  put_u16(&bytes, map_offset + 22u, 0u);
+  put_u16(&bytes, map_offset + 24u, 0x1Cu);
+  put_u16(&bytes, map_offset + 26u, 0x34u);
+
+  put_u16(&bytes, type_list_offset, 0u);
+  put_u32(&bytes, type_list_offset + 2u, type_code('A', 'D', 'g', 'm'));
+  put_u16(&bytes, type_list_offset + 6u, 0u);
+  put_u16(&bytes, type_list_offset + 8u, static_cast<uint16_t>(reference_list_offset - type_list_offset));
+
+  put_u16(&bytes, reference_list_offset, 0);
+  put_u16(&bytes, reference_list_offset + 2u, 0);
+  bytes[reference_list_offset + 4u] = 0x10u;
+  put_u24(&bytes, reference_list_offset + 5u, 0u);
+
+  bytes[name_list_offset] = 4u;
+  bytes[name_list_offset + 1u] = 'm';
+  bytes[name_list_offset + 2u] = 'a';
+  bytes[name_list_offset + 3u] = 'i';
+  bytes[name_list_offset + 4u] = 'n';
+
+  return bytes;
 }
 
 }  // namespace
@@ -142,4 +218,57 @@ TEST_CASE("core context lifecycle, traps, and fixture execution are deterministi
   CHECK(std::strcmp(events[11].name, "fixture.incomplete") == 0);
   CHECK(events[11].value == 0u);
   CHECK(std::strcmp(events[12].name, "context.destroy") == 0);
+}
+
+TEST_CASE("module C ABI loads ADgm resource fork and exposes headless framebuffer") {
+  std::vector<CapturedTrace> events;
+  nf_context_options options{
+      capture_trace,
+      &events,
+  };
+
+  nf_context *context = nullptr;
+  REQUIRE(nf_context_create(&options, &context) == NF_OK);
+  REQUIRE(context != nullptr);
+  CHECK(nf_context_set_random_seed(context, 0x00C0FFEEu) == NF_OK);
+
+  char path[] = "/tmp/nightfall-adgm-fixture-XXXXXX";
+  const int fd = mkstemp(path);
+  REQUIRE(fd >= 0);
+  close(fd);
+
+  const std::vector<uint8_t> resource_fork = make_adgm_resource_fork_fixture();
+  REQUIRE(setxattr(path, "com.apple.ResourceFork", resource_fork.data(), resource_fork.size(), 0u, 0) == 0);
+
+  CHECK(nf_module_load(context, path) == NF_OK);
+  CHECK(nf_module_start(context, 64u, 32u) == NF_OK);
+  CHECK(nf_advance(context, 10u) == NF_OK);
+  CHECK(nf_context_ticks(context) == 10u);
+
+  const uint8_t *pixels = nullptr;
+  uint32_t width = 0u;
+  uint32_t height = 0u;
+  uint32_t stride = 0u;
+  CHECK(nf_module_framebuffer(context, &pixels, &width, &height, &stride) == NF_OK);
+  REQUIRE(pixels != nullptr);
+  CHECK(width == 64u);
+  CHECK(height == 32u);
+  CHECK(stride == 256u);
+  CHECK(pixels[0] == 0u);
+  CHECK(pixels[(static_cast<size_t>(height) - 1u) * stride + stride - 1u] == 0u);
+
+  CHECK(nf_module_stop(context) == NF_OK);
+  CHECK(nf_module_framebuffer(context, &pixels, &width, &height, &stride) == NF_ERROR_INVALID_ARGUMENT);
+
+  nf_context_destroy(context);
+  std::remove(path);
+
+  REQUIRE(events.size() >= 7u);
+  CHECK(std::strcmp(events[0].name, "context.create") == 0);
+  CHECK(std::strcmp(events[1].name, "context.random_seed") == 0);
+  CHECK(std::strcmp(events[2].name, "load.adgm0") == 0);
+  CHECK(std::strcmp(events[3].name, "start.traps") == 0);
+  CHECK(std::strcmp(events[4].name, "start.unimplemented_traps") == 0);
+  CHECK(std::strcmp(events[5].name, "start") == 0);
+  CHECK(std::strcmp(events[6].name, "advance") == 0);
 }

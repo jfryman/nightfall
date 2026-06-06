@@ -1,9 +1,15 @@
+nf_advance
 nf_context_create
 nf_context_destroy
 nf_context_dispatch_trap
 nf_context_execute_fixture
 nf_context_register_trap
+nf_context_set_random_seed
 nf_context_tick
 nf_context_ticks
 nf_get_version
+nf_module_framebuffer
+nf_module_load
+nf_module_start
+nf_module_stop
 nf_trap_is_aline

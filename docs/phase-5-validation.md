@@ -52,6 +52,14 @@ After adjudication, the minimal runner backfill was started:
   reset vectors, A-line trap capture, and synthetic tests.
 - `tools/tbtrace` reads a local module's macOS resource fork xattr and runs the
   `ADgm/0` resource without committing module bytes.
+- `core/nightfall.h` now exposes the missing Phase 5 C ABI backfill:
+  `nf_module_load`, `nf_module_start`, `nf_advance`,
+  `nf_module_framebuffer`, `nf_module_stop`, and
+  `nf_context_set_random_seed`; the ABI snapshot and symbol snapshot were
+  updated with the sanctioned backfill.
+- `core/nightfall.test.cpp` covers the module C ABI with a synthetic resource
+  fork xattr fixture, asserting load/start/advance/framebuffer/stop state
+  without using real module bytes.
 
 Local real-module probe against ignored
 `.nightfall/manual-modules/Flying Toasters`:
@@ -63,8 +71,18 @@ Local real-module probe against ignored
 - default entry result: `status: ok`, `stop-reason: rts`, `trap-count: 0`,
   `unimplemented-trap-count: 0`
 
+Local Gate Log after the ABI backfill:
+
+- PASS: `cmake --build build && ctest --test-dir build --output-on-failure`
+- PASS: `scripts/ci/run-local.sh`
+- PASS: `build/tbtrace .nightfall/manual-modules/Flying\ Toasters --cycles
+  60000000` for raw `ADgm/0` entry only, with zero unimplemented traps.
+
 Result: the backfilled runner can parse and enter the real module, but the
 remaining checkpoint work requires the After Dark graphics-module lifecycle ABI.
-Work on that affected ABI is stopped by
-`docs/blockers/phase-5-after-dark-lifecycle-contamination.md` after public web
-search output exposed Berkeley Systems sample source/header material.
+Work on that affected ABI stopped in the prior session after public web search
+output exposed Berkeley Systems sample source/header material. The handoff
+blocker is resolved, but the repo still lacks a clean sanctioned lifecycle ABI
+source or maintainer-authored sanitized artifact. Phase 5 is therefore stopped
+again at
+`docs/blockers/phase-5-clean-lifecycle-abi-needed.md`.

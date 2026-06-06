@@ -1,14 +1,14 @@
 # Nightfall — Current Phase
 
 **Current phase:** 5
-**Status:** In progress
+**Status:** Blocked
 **Started:** 2026-06-06
 **Timebox:** 24 cycles / 32 active hours
-**Cycle count:** 0 / 24
+**Cycle count:** 1 / 24
 **Active hours:** 0 / 32
 **Next expected deliverable:** docs/phase-5-validation.md
 **Agent(s) assigned:** codex-gpt-5
-**Last blocker:** docs/blockers/resolved/phase-5-after-dark-lifecycle-contamination.md
+**Last blocker:** docs/blockers/phase-5-clean-lifecycle-abi-needed.md
 **Run status:** in progress
 
 ## Recent completions
@@ -94,3 +94,8 @@ Required artifacts:
   `docs/blockers/resolved/phase-5-after-dark-lifecycle-contamination.md`.
   Maintainer marked the blocker resolved for handoff and requested this session
   cease all work because protected-code material entered the session.
+- 2026-06-06: Fresh-session Phase 5 backfill added the missing C ABI surface and
+  kept local gates green, but the real-module checkpoint still cannot honestly
+  claim a 10-minute lifecycle run because the repository has no clean sanctioned
+  After Dark graphics-module lifecycle ABI artifact. Blocker opened:
+  `docs/blockers/phase-5-clean-lifecycle-abi-needed.md`.

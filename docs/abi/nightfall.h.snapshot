@@ -54,6 +54,7 @@ nf_status nf_context_create(const nf_context_options *options, nf_context **out_
 void nf_context_destroy(nf_context *context);
 nf_status nf_context_tick(nf_context *context, uint32_t ticks);
 uint64_t nf_context_ticks(const nf_context *context);
+nf_status nf_context_set_random_seed(nf_context *context, uint32_t seed);
 int nf_trap_is_aline(uint16_t trap_word);
 nf_status nf_context_register_trap(nf_context *context,
                                    uint16_t trap_word,
@@ -64,6 +65,15 @@ nf_status nf_context_execute_fixture(nf_context *context,
                                      const uint8_t *bytes,
                                      size_t byte_count,
                                      nf_execution_result *out_result);
+nf_status nf_module_load(nf_context *context, const char *path);
+nf_status nf_module_start(nf_context *context, uint32_t width, uint32_t height);
+nf_status nf_advance(nf_context *context, uint32_t virtual_ticks);
+nf_status nf_module_framebuffer(const nf_context *context,
+                                const uint8_t **out_pixels,
+                                uint32_t *out_width,
+                                uint32_t *out_height,
+                                uint32_t *out_stride);
+nf_status nf_module_stop(nf_context *context);
 
 #ifdef __cplusplus
 }

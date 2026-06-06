@@ -1,7 +1,7 @@
 # nightfall core context
 
-This unit currently owns the minimal bootstrap C ABI and context lifecycle used
-to prove the local build/test/gate loop.
+This unit owns the bootstrap C ABI, context lifecycle, and the Phase 5 headless
+module-loading backfill used by `tbtrace` and later macOS app wiring.
 
 Contexts are allocated from a fixed static pool to keep the Phase 1/2 core
 deterministic and avoid heap allocation in sanitizer smoke runs.
@@ -24,6 +24,14 @@ events.
 `nf_context_execute_fixture` is a bootstrap fixture runner. It reads big-endian
 16-bit words, dispatches A-line trap words, and stops on `RTS`. It intentionally
 does not implement general 68k execution.
+
+The Phase 5 module C ABI (`nf_module_load`, `nf_module_start`, `nf_advance`,
+`nf_module_framebuffer`, and `nf_module_stop`) is a minimal headless backfill for
+the plan's missing prior-phase runner/API surface. It reads a macOS resource
+fork xattr, parses the fork with `ResourceFork`, loads `ADgm/0`, and executes the
+bounded default entry through `M68KRuntime`. It deliberately does not implement
+or infer After Dark lifecycle selector/message semantics; that work remains
+blocked until clean provenance is supplied.
 
 `nightfall.sanitizer.cpp` is a narrow sanitizer smoke harness. It avoids doctest
 because doctest plus ASan can deadlock during ASan runtime initialization on this
