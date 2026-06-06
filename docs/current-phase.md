@@ -1,14 +1,14 @@
 # Nightfall — Current Phase
 
 **Current phase:** 5
-**Status:** Blocked
+**Status:** In progress
 **Started:** 2026-06-06
 **Timebox:** 24 cycles / 32 active hours
 **Cycle count:** 0 / 24
 **Active hours:** 0 / 32
 **Next expected deliverable:** docs/phase-5-validation.md
 **Agent(s) assigned:** codex-gpt-5
-**Last blocker:** docs/blockers/phase-5-after-dark-lifecycle-contamination.md
+**Last blocker:** docs/blockers/resolved/phase-5-after-dark-lifecycle-contamination.md
 **Run status:** in progress
 
 ## Recent completions
@@ -91,4 +91,6 @@ Required artifacts:
   lifecycle ABI exposed Berkeley Systems sample source/header material in web
   search output. Work on that affected subsystem is stopped pending
   adjudication:
-  `docs/blockers/phase-5-after-dark-lifecycle-contamination.md`.
+  `docs/blockers/resolved/phase-5-after-dark-lifecycle-contamination.md`.
+  Maintainer marked the blocker resolved for handoff and requested this session
+  cease all work because protected-code material entered the session.

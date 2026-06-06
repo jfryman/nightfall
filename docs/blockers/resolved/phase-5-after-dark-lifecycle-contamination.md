@@ -56,6 +56,8 @@ Resume only after the maintainer appends an adjudication block below with
 
 ## Adjudication 2026-06-06
 
-Decision:
+Decision: Maintainer marked this blocker resolved for handoff. Current session
+must cease because protected-code material entered the session; future work
+should continue only from a fresh session and repo state.
 
-**Resume:** no
+**Resume:** yes
