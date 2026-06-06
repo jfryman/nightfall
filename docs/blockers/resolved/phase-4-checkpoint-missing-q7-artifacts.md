@@ -70,3 +70,17 @@ Resume only after the maintainer appends an adjudication block below with
 Decision:
 
 **Resume:** no
+
+## Adjudication 2026-06-06 — Option 2
+
+**Decision:** Option 2: authorize a reduced synthetic-only Phase 4 checkpoint
+using the committed fixtures, generated PICT coverage, and local gate suite.
+Real-module Q7 benchmark evidence remains maintainer-manual and must be supplied
+or revisited before any public-release claim that depends on those modules.
+**Rationale:** The Phase 4 QuickDraw subset is complete and locally gated, but
+the real-module artifacts are absent. Proceeding with an explicit synthetic-only
+checkpoint keeps Phase A moving without pretending that the missing real-module
+evidence exists.
+**Decisions-log entry:** `docs/decisions-log.md`, "2026-06-06 — Phase 4
+checkpoint synthetic-only resume".
+**Resume:** yes

@@ -184,6 +184,20 @@ becomes the source of generated PICT 2 fixtures for Phase 4.6, `fuzz-pict` is
 wired as a libFuzzer target, and later PICT opcode coverage must grow generator,
 parser, and fuzzer coverage together.
 
+### 2026-06-06 — Phase 4 checkpoint synthetic-only resume
+**Context:** The Phase 4 checkpoint requires Q7 color-depth validation against
+the benchmark modules, but maintainer-provided sanitized artifacts were absent
+and real modules cannot be loaded in CI. The blocker at
+`docs/blockers/resolved/phase-4-checkpoint-missing-q7-artifacts.md` was
+adjudicated with `**Resume:** yes` for Option 2. **Decision:** complete the
+Phase 4 checkpoint using committed synthetic fixtures, generated PICT coverage,
+and the local gate suite, while explicitly recording that real-module Q7 evidence
+is not present in this checkpoint. **Rationale:** this keeps Phase A moving after
+maintainer authorization without fabricating real-module evidence or weakening
+the no-real-modules-in-CI rule. **Consequences:** the run proceeds to Phase 5;
+real-module benchmark validation remains maintainer-manual evidence to supply or
+revisit before any later compatibility/release claim depends on it.
+
 ---
 
 ### Open (not yet decided)
