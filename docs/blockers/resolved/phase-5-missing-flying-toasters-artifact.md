@@ -60,8 +60,13 @@ decision.
 Resume only after the maintainer appends an adjudication block below with
 `**Resume:** yes`.
 
-## Adjudication 2026-06-06
+## Adjudication 2026-06-06 — local module supplied
 
-Decision:
+Decision: The maintainer supplied a local legally held module copy and directed
+the agent to use it for local Phase 5 testing, copying it into ignored repo
+scratch only if necessary and ensuring it is not committed.
 
-**Resume:** no
+Rationale: This satisfies the missing-local-input portion of the blocker while
+preserving the no-real-modules-in-CI and no-committed-real-modules rules.
+
+**Resume:** yes

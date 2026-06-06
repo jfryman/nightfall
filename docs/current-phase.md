@@ -8,7 +8,7 @@
 **Active hours:** 0 / 32
 **Next expected deliverable:** docs/phase-5-validation.md
 **Agent(s) assigned:** codex-gpt-5
-**Last blocker:** docs/blockers/phase-5-missing-flying-toasters-artifact.md
+**Last blocker:** docs/blockers/phase-5-missing-real-module-runner.md
 **Run status:** in progress
 
 ## Recent completions
@@ -81,7 +81,7 @@ Required artifacts:
 
 ## Blocked
 
-- 2026-06-06: Phase 5 implementation and local gates are complete, but the
-  maintainer-manual Flying Toasters 10-minute checkpoint artifact is absent.
-  Open blocker:
-  `docs/blockers/phase-5-missing-flying-toasters-artifact.md`.
+- 2026-06-06: Maintainer supplied the local Flying Toasters module and it was
+  copied only into ignored `.nightfall/` scratch, but the current repository
+  lacks a real-module execution runner/API for the required 10-minute checkpoint.
+  Open blocker: `docs/blockers/phase-5-missing-real-module-runner.md`.

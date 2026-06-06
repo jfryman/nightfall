@@ -37,5 +37,9 @@ The Phase 5 real-module checkpoint requires a maintainer-manual Flying Toasters
 not produced by CI and must be supplied as a sanitized committed artifact, or
 this phase must open a blocker requesting it.
 
-Result: blocker opened at
-`docs/blockers/phase-5-missing-flying-toasters-artifact.md`.
+Result: maintainer supplied the local module, resolving the missing-input
+blocker at
+`docs/blockers/resolved/phase-5-missing-flying-toasters-artifact.md`.
+The checkpoint remains blocked because the current repository lacks a
+real-module execution runner/API:
+`docs/blockers/phase-5-missing-real-module-runner.md`.
