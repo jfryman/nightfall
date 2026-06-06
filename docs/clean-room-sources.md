@@ -461,3 +461,49 @@ Rules:
 - **Implemented from this source:** Phase 5 exposes deterministic
   `TickCount`, `LMGetTicks`, `Delay`, `GetDateTime`, and virtual date/time
   state for headless tests.
+
+## Phase 5 Resource Fork Runner Backfill
+
+- **Source:** Apple Computer, *Inside Macintosh: More Macintosh Toolbox*,
+  Chapter 1, "Resource Manager Reference", "Resource File Format", mirrored at:
+  `https://dev.os9.ca/techpubs/mac/MoreToolbox/MoreToolbox-99.html`
+- **Consulted for:** Resource forks contain a resource data area and a
+  resource map; the map contains a resource type list and per-type reference
+  lists; resource data is addressed from the data area by offsets recorded in
+  reference entries.
+- **Implemented from this source:** `core/ResourceFork.cpp` validates the
+  resource fork header, map offsets, type list, reference lists, optional
+  resource names, and length-prefixed resource payloads before exposing a
+  type/ID index to the local runner.
+
+- **Source:** Apple Computer, *Inside Macintosh: More Macintosh Toolbox*,
+  Chapter 1, "Resource Manager Reference", "Resource File Format", figure and
+  field descriptions, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/MoreToolbox/MoreToolbox-99.html`
+- **Consulted for:** Type entries store the four-character resource type, a
+  count-minus-one, and the reference-list offset; reference entries store the
+  resource ID, optional name-list offset, attributes, and three-byte data
+  offset.
+- **Implemented from this source:** `core/ResourceFork.cpp` decodes those
+  big-endian fields directly and rejects truncated or out-of-range structures.
+
+- **Source:** Karl Stenerud, Musashi `readme.txt`, "Basic Configuration", from
+  pinned commit `313ebf1bd9f4d0d93341eb5ce21fd8a119e9dbdd` at:
+  `https://github.com/kstenerud/Musashi`
+- **Consulted for:** Musashi hosts provide `m68k_read_memory_*` and
+  `m68k_write_memory_*` callbacks, call `m68k_pulse_reset`, and run instructions
+  through `m68k_execute`.
+- **Implemented from this source:** `core/M68KRuntime.cpp` supplies bounded
+  big-endian emulated-memory callbacks, seeds reset vectors, and executes a
+  68000 program image under a finite cycle budget.
+
+- **Source:** Karl Stenerud, Musashi `m68kconf.h`, instruction hook
+  configuration, from pinned commit
+  `313ebf1bd9f4d0d93341eb5ce21fd8a119e9dbdd` at:
+  `https://github.com/kstenerud/Musashi`
+- **Consulted for:** `M68K_INSTRUCTION_HOOK` with
+  `M68K_OPT_SPECIFY_HANDLER` calls a host-specified instruction callback before
+  each instruction.
+- **Implemented from this source:** `core/M68KRuntime.cpp` uses the instruction
+  hook to record A-line Toolbox trap words and skip them before Musashi raises
+  the 1010 exception.

@@ -43,3 +43,28 @@ blocker at
 The checkpoint remains blocked because the current repository lacks a
 real-module execution runner/API:
 `docs/blockers/resolved/phase-5-missing-real-module-runner.md`.
+
+After adjudication, the minimal runner backfill was started:
+
+- `core/ResourceFork.cpp` parses raw Macintosh resource fork bytes into a
+  type/ID index using Inside Macintosh Resource Manager documentation.
+- `core/M68KRuntime.cpp` wraps pinned Musashi execution with bounded memory,
+  reset vectors, A-line trap capture, and synthetic tests.
+- `tools/tbtrace` reads a local module's macOS resource fork xattr and runs the
+  `ADgm/0` resource without committing module bytes.
+
+Local real-module probe against ignored
+`.nightfall/manual-modules/Flying Toasters`:
+
+- resource fork bytes: 30903
+- resource count: 27
+- `ADgm` count: 1
+- `ADgm/0` bytes: 12402
+- default entry result: `status: ok`, `stop-reason: rts`, `trap-count: 0`,
+  `unimplemented-trap-count: 0`
+
+Result: the backfilled runner can parse and enter the real module, but the
+remaining checkpoint work requires the After Dark graphics-module lifecycle ABI.
+Work on that affected ABI is stopped by
+`docs/blockers/phase-5-after-dark-lifecycle-contamination.md` after public web
+search output exposed Berkeley Systems sample source/header material.

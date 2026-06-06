@@ -1,14 +1,14 @@
 # Nightfall — Current Phase
 
 **Current phase:** 5
-**Status:** In progress
+**Status:** Blocked
 **Started:** 2026-06-06
 **Timebox:** 24 cycles / 32 active hours
 **Cycle count:** 0 / 24
 **Active hours:** 0 / 32
 **Next expected deliverable:** docs/phase-5-validation.md
 **Agent(s) assigned:** codex-gpt-5
-**Last blocker:** docs/blockers/resolved/phase-5-missing-real-module-runner.md
+**Last blocker:** docs/blockers/phase-5-after-dark-lifecycle-contamination.md
 **Run status:** in progress
 
 ## Recent completions
@@ -86,3 +86,9 @@ Required artifacts:
   lacks a real-module execution runner/API for the required 10-minute checkpoint.
   Blocker adjudicated with `**Resume:** yes` for scoped backfill:
   `docs/blockers/resolved/phase-5-missing-real-module-runner.md`.
+- 2026-06-06: Resource fork parsing and a bounded Musashi-backed `tbtrace`
+  runner were backfilled, but identifying the After Dark graphics-module
+  lifecycle ABI exposed Berkeley Systems sample source/header material in web
+  search output. Work on that affected subsystem is stopped pending
+  adjudication:
+  `docs/blockers/phase-5-after-dark-lifecycle-contamination.md`.

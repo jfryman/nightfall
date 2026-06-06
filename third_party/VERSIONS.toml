@@ -21,6 +21,12 @@ cmake = "4.3.0"
 [dependencies.musashi]
 repo = "https://github.com/kstenerud/Musashi"
 kind = "git"
+commit = "313ebf1bd9f4d0d93341eb5ce21fd8a119e9dbdd"
+selected = "latest reachable commit as of bootstrap date 2026-05-28; repository has no tags"
+vendored_path = "third_party/musashi"
+generated_opcode_tables = true
+generated_by = "m68kmake from the same pinned commit"
+bundled_softfloat = "John R. Hauser SoftFloat Release 2b files bundled by Musashi"
 
 [dependencies.nlohmann_json]
 repo = "https://github.com/nlohmann/json"
