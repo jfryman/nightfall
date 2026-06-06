@@ -1,7 +1,7 @@
 # Toolbox Coverage
 
 This coverage snapshot reflects the co-located Toolbox implementation, test,
-fixture, and citation files present after Phase 4.6. The mechanical coverage
+fixture, and citation files present during Phase 5. The mechanical coverage
 gate is `scripts/ci/tbcover.py`; `scripts/ci/run-local.sh` passed with
 `PASS tbcover core`.
 
@@ -13,7 +13,9 @@ gate is `scripts/ci/tbcover.py`; `scripts/ci/run-local.sh` passed with
 | QuickDraw | Region operations (`NewRgn`, `DisposeRgn`, `SetRectRgn`, `RectRgn`, `OffsetRgn`, `CopyRgn`, `UnionRgn`, `SectRgn`, `DiffRgn`, `EmptyRgn`, `EqualRgn`, `PtInRgn`, `SetClip`, `GetClip`) | Implemented | `core/QuickDrawRegion.cpp`, `core/QuickDrawRegion.test.cpp`, `core/QuickDrawRegion.fixture.s`, `core/QuickDrawRegion.md` |
 | QuickDraw | Bit transfer (`CopyBits`, `CopyMask`) | Implemented | `core/QuickDrawBitTransfer.cpp`, `core/QuickDrawBitTransfer.test.cpp`, `core/QuickDrawBitTransfer.fixture.s`, `core/QuickDrawBitTransfer.md` |
 | QuickDraw | PICT interpreter (`DrawPicture`) | Implemented | `core/QuickDrawPicture.cpp`, `core/QuickDrawPicture.test.cpp`, `core/QuickDrawPicture.fixture.s`, `core/QuickDrawPicture.md`, `core/QuickDrawPicture.fuzz.cpp` |
+| Toolbox Managers | Memory/Resource/Sound-stub/misc (`NewHandle`, `DisposeHandle`, `GetHandleSize`, `SetHandleSize`, `HLock`, `HUnlock`, `HGetState`, `HSetState`, `NewPtr`, `DisposePtr`, `GetResource`, `ReleaseResource`, `GetResourceSizeOnDisk`, `DetachResource`, `TickCount`, `GetDateTime`, `Delay`, `LMGetTicks`, silent Sound Manager) | Implemented | `core/ToolboxManagers.cpp`, `core/ToolboxManagers.test.cpp`, `core/ToolboxManagers.fixture.s`, `core/ToolboxManagers.md` |
 
-## Pending Phase 4 Checkpoint
+## Pending Phase 5 Checkpoint
 
-- Q7 color-depth validation against the Phase 4 benchmark modules.
+- Maintainer-manual Flying Toasters end-to-end 10-minute run with zero
+  unimplemented-trap warnings, or blocker if the artifact is absent.

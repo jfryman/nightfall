@@ -1,14 +1,14 @@
 # Nightfall — Current Phase
 
 **Current phase:** 5
-**Status:** In progress
+**Status:** Blocked
 **Started:** 2026-06-06
 **Timebox:** 24 cycles / 32 active hours
 **Cycle count:** 0 / 24
 **Active hours:** 0 / 32
 **Next expected deliverable:** docs/phase-5-validation.md
 **Agent(s) assigned:** codex-gpt-5
-**Last blocker:** docs/blockers/resolved/phase-4-checkpoint-missing-q7-artifacts.md
+**Last blocker:** docs/blockers/phase-5-missing-flying-toasters-artifact.md
 **Run status:** in progress
 
 ## Recent completions
@@ -78,3 +78,10 @@ Required artifacts:
 - Flying Toasters end-to-end checkpoint evidence, or blocker if required
   maintainer-manual artifacts are absent.
 - Local gate suite and required GitHub check green before merge.
+
+## Blocked
+
+- 2026-06-06: Phase 5 implementation and local gates are complete, but the
+  maintainer-manual Flying Toasters 10-minute checkpoint artifact is absent.
+  Open blocker:
+  `docs/blockers/phase-5-missing-flying-toasters-artifact.md`.

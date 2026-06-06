@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(nightfall_core STATIC
+  core/ToolboxManagers.cpp
   core/QuickDrawPort.cpp
   core/QuickDrawBitTransfer.cpp
   core/QuickDrawLine.cpp
@@ -30,6 +31,7 @@ target_compile_options(nightfall_core PRIVATE
 enable_testing()
 
 add_executable(nightfall_core_tests
+  core/ToolboxManagers.test.cpp
   core/QuickDrawPort.test.cpp
   core/QuickDrawBitTransfer.test.cpp
   core/QuickDrawLine.test.cpp

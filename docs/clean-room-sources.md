@@ -362,3 +362,102 @@ Rules:
 - **Consulted for:** Trap word for `DrawPicture` (`A8F6`).
 - **Implemented from this source:** Phase 4.6 `DrawPicture` trap-word constant
   for the fixture and trace assertions.
+
+## Phase 5 Toolbox Managers
+
+- **Source:** Apple Computer, *Inside Macintosh: Memory*, Chapter 2, "Memory
+  Manager Reference", `NewHandle`, mirrored at:
+  `https://leopard-adc.pepas.com/documentation/mac/Memory/Memory-67.html`
+- **Consulted for:** `NewHandle` allocates a relocatable memory block of the
+  requested logical size and returns a handle; newly allocated handles are
+  unlocked and unpurgeable.
+- **Implemented from this source:** Phase 5 models handles as relocatable blocks
+  with logical size, data address, and state bits.
+
+- **Source:** Apple Computer, *Inside Macintosh: Memory*, Chapter 2, "Memory
+  Manager Reference", `DisposeHandle`, mirrored at:
+  `https://leopard-adc.pepas.com/documentation/mac/Memory/Memory-73.html`
+- **Consulted for:** `DisposeHandle` releases the memory occupied by a
+  relocatable block and invalidates subsequent use of that handle.
+- **Implemented from this source:** Phase 5 invalidates modeled handles on
+  disposal and rejects stale handle operations.
+
+- **Source:** Apple Computer, *Inside Macintosh: Memory*, Chapter 2, "Memory
+  Manager Reference", "Allocating and Releasing Nonrelocatable Blocks of
+  Memory", mirrored at:
+  `https://leopard-adc.pepas.com/documentation/mac/Memory/Memory-74.html`
+- **Consulted for:** `NewPtr` allocates a nonrelocatable block and
+  `DisposePtr` frees nonrelocatable blocks allocated by the Memory Manager.
+- **Implemented from this source:** Phase 5 models fixed pointer blocks with
+  stable addresses and explicit disposal.
+
+- **Source:** Apple Computer, *Inside Macintosh: Memory*, Chapter 2, "Memory
+  Manager Reference", "Changing the Sizes of Relocatable and Nonrelocatable
+  Blocks", mirrored at:
+  `https://leopard-adc.pepas.com/documentation/mac/Memory/Memory-80.html`
+- **Consulted for:** `GetHandleSize` and `SetHandleSize` query and change the
+  logical size of a relocatable block.
+- **Implemented from this source:** Phase 5 tracks modeled handle logical sizes
+  and permits deterministic resizing.
+
+- **Source:** Apple Computer, *Inside Macintosh: Memory*, Chapter 2, "Memory
+  Manager Reference", `HGetState`, `HSetState`, `HLock`, and `HUnlock`,
+  mirrored at:
+  `https://leopard-adc.pepas.com/documentation/mac/Memory/Memory-86.html`,
+  `https://leopard-adc.pepas.com/documentation/mac/Memory/Memory-87.html`,
+  `https://leopard-adc.pepas.com/documentation/mac/Memory/Memory-88.html`, and
+  `https://leopard-adc.pepas.com/documentation/mac/Memory/Memory-89.html`
+- **Consulted for:** `HGetState` returns master-pointer state flags, including
+  resource, purgeable, and locked bits; `HSetState` restores those flags;
+  `HLock` and `HUnlock` set and clear the locked bit.
+- **Implemented from this source:** Phase 5 preserves the documented state bits
+  in modeled handles, with bit 7 used for locking and bit 5 for Resource Manager
+  ownership.
+
+- **Source:** Apple Computer, *Inside Macintosh: More Macintosh Toolbox*,
+  Chapter 1, "Resource Manager Reference", `GetResource`, mirrored at:
+  `https://dev.os9.ca/techpubs/mac/MoreToolbox/MoreToolbox-50.html`
+- **Consulted for:** `GetResource` searches resource maps by type and ID and
+  returns a handle to the resource data, reading it into memory when necessary.
+- **Implemented from this source:** Phase 5 provides a deterministic in-memory
+  resource map for tests and fixtures, keyed by type and ID, returning modeled
+  Memory Manager handles.
+
+- **Source:** Apple Computer, *Inside Macintosh: More Macintosh Toolbox*,
+  Chapter 1, "Resource Manager", "Releasing and Detaching Resources", mirrored
+  at:
+  `https://dev.os9.ca/techpubs/mac/MoreToolbox/MoreToolbox-19.html`
+- **Consulted for:** `ReleaseResource` releases memory associated with a
+  resource and invalidates the application's handle; `DetachResource` removes a
+  resource handle from Resource Manager ownership while leaving the application
+  handle usable.
+- **Implemented from this source:** Phase 5 releases modeled resource handles
+  and detaches resource ownership without freeing the underlying modeled handle.
+
+- **Source:** Apple Computer, *Inside Macintosh X-Ref*, "System Traps", pages
+  63-77, preserved at:
+  `https://vintageapple.org/macprogramming/pdf/Inside_Macintosh_X-Ref_1988.pdf`
+- **Consulted for:** Trap words for the Phase 5 Memory Manager, Resource
+  Manager, time, and Sound Manager routines covered by this implementation.
+- **Implemented from this source:** Phase 5 trap-word constants for fixtures and
+  trace assertions.
+
+- **Source:** Apple Computer, *Inside Macintosh: Sound*, Chapter 2, "Sound
+  Manager", "Managing Sound Channels", mirrored at:
+  `https://dev.os9.ca/techpubs/mac/Sound/Sound-51.html`
+- **Consulted for:** `SndNewChannel` allocates a sound channel and command
+  queue; `SndDoCommand` queues commands on a sound channel. The plan requires
+  Sound Manager to be stubbed silent in Phase 5.
+- **Implemented from this source:** Phase 5 allocates modeled silent sound
+  channels, records queued commands, and performs no audio output.
+
+- **Source:** Nightfall plan Q1 timing model in `nightfall-plan-macos.md`,
+  together with Apple Computer, *Inside Macintosh X-Ref*, "System Traps", pages
+  63-77, preserved at:
+  `https://vintageapple.org/macprogramming/pdf/Inside_Macintosh_X-Ref_1988.pdf`
+- **Consulted for:** Nightfall uses a virtual clock; `TickCount` reads that
+  virtual counter. X-Ref records trap words for `TickCount`, `Delay`, and the
+  date/time routines.
+- **Implemented from this source:** Phase 5 exposes deterministic
+  `TickCount`, `LMGetTicks`, `Delay`, `GetDateTime`, and virtual date/time
+  state for headless tests.
